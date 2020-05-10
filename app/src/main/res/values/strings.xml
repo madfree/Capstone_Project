@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Capstone Project</string>
+
+    <string-array name="category_array">
+        <item>Geography</item>
+        <item>Sport</item>
+        <item>History</item>
+        <item>Music</item>
+        <item>Art</item>
+    </string-array>
+
+    <string-array name="difficulty_array">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+
 </resources>

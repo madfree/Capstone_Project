@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
 
-    private String mUserNameE;
+    private String mUserName;
 
     // Firebase Instance Variables
     private FirebaseAuth mFirebaseAuth;
@@ -40,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
                 if (user != null) {
                     // the user is signed in
-                    mUserNameE = user.getDisplayName();
+                    mUserName = user.getDisplayName();
                 } else {
                     // user is not signed in
-                    mUserNameE = ANONYMOUS;
+                    mUserName = ANONYMOUS;
                     startActivityForResult(
                             AuthUI.getInstance()
                             .createSignInIntentBuilder()
@@ -56,6 +58,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        Spinner categorySpinner = findViewById(R.id.spinner_category);
+        ArrayAdapter categoryAdapter = ArrayAdapter.
+                createFromResource(this, R.array.category_array, android.R.layout.simple_spinner_item);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categoryAdapter);
+
+        Spinner difficultySpinner = findViewById(R.id.spinner_difficulty);
+        ArrayAdapter difficultyAdapter = ArrayAdapter.
+                createFromResource(this, R.array.difficulty_array, android.R.layout.simple_spinner_item);
+        difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        difficultySpinner.setAdapter(difficultyAdapter);
     }
 
     @Override
