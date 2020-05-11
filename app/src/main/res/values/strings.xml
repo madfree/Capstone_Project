@@ -2,6 +2,7 @@
     <string name="app_name">Qwizard</string>
 
     <string-array name="category_array">
+        <item>Select a category</item>
         <item>Geography</item>
         <item>Sport</item>
         <item>History</item>
@@ -10,6 +11,7 @@
     </string-array>
 
     <string-array name="difficulty_array">
+        <item>Select a difficulty</item>
         <item>Easy</item>
         <item>Medium</item>
         <item>Hard</item>
