@@ -97,7 +97,7 @@
         android:id="@+id/edit_text_wrong_answer_3"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:hint="wrong answer 2"
+        android:hint="wrong answer 3"
         app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
