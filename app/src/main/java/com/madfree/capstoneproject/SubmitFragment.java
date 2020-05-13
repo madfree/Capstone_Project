@@ -1,7 +1,10 @@
 package com.madfree.capstoneproject;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.PrecomputedText;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +17,20 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import static android.app.Activity.RESULT_OK;
 
 public class SubmitFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -27,10 +38,16 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
     public static final int DEFAULT_QUESTION_LENGTH = 300;
     public static final int DEFAULT_ANSWER_LENGTH = 30;
+    public static final int RC_PHOTO_PICKER = 2;
 
     private String mSelectedCategory;
     private String mSelectedDifficulty;
     private String mImageUrl;
+
+    private Uri selectedImageUri;
+
+    // TODO: Implement method to check if all fields are filled before submit button is activated
+    private boolean isEveryFieldFilled;
 
     private EditText mQuestionEditText;
     private EditText mAnswerEditText;
@@ -46,6 +63,8 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTriviaDatabaseReference;
+    private FirebaseStorage mFirebaseStorage;
+    private StorageReference mTriviaImageStorageReference;
 
     @Nullable
     @Override
@@ -54,6 +73,8 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mTriviaDatabaseReference = mFirebaseDatabase.getReference().child("trivia");
+        mFirebaseStorage = mFirebaseStorage.getInstance();
+        mTriviaImageStorageReference = mFirebaseStorage.getReference().child("trivia_images");
 
         View view = inflater.inflate(R.layout.fragment_submit, container, false);
 
@@ -65,6 +86,17 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mPhotoPickerButton = view.findViewById(R.id.photoPickerButton);
         mCategorySpinner = view.findViewById(R.id.spinner_category);
         mDifficultySpinner = view.findViewById(R.id.spinner_difficulty);
+
+        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // method to upload photo for a trivia question
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Pick an image"), RC_PHOTO_PICKER);
+            }
+        });
 
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.
                 createFromResource(view.getContext(), R.array.category_array, android.R.layout.simple_spinner_item);
@@ -89,19 +121,18 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onClick(View view) {
                 Trivia mNewTrivia = new Trivia(
-                    mQuestionEditText.getText().toString(),
-                    mAnswerEditText.getText().toString(),
-                    mWrong1EditText.getText().toString(),
-                    mWrong2EditText.getText().toString(),
-                    mWrong3EditText.getText().toString(),
-                    mImageUrl,
-                    mSelectedCategory,
-                    mSelectedDifficulty
+                        mQuestionEditText.getText().toString(),
+                        mAnswerEditText.getText().toString(),
+                        mWrong1EditText.getText().toString(),
+                        mWrong2EditText.getText().toString(),
+                        mWrong3EditText.getText().toString(),
+                        mImageUrl,
+                        mSelectedCategory,
+                        mSelectedDifficulty
                 );
                 mTriviaDatabaseReference.push().setValue(mNewTrivia);
             }
         });
-
         return view;
     }
 
@@ -121,5 +152,38 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     public void onNothingSelected(AdapterView<?> adapterView) {
         // Throw error message when clicking submit button
         Toast.makeText(getContext(), "Please select a category and/or difficulty", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+            selectedImageUri = data.getData();
+
+            // get the image reference
+            final StorageReference imageRef = mTriviaImageStorageReference.child(selectedImageUri.getLastPathSegment());
+            // upload the image to Firebase
+            imageRef.putFile(selectedImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return imageRef.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "image successfully uploaded", Toast.LENGTH_SHORT).show();
+                        Uri downloadUri = task.getResult();
+                        // set the mImageUrl Variable to the downloadUri from Firebase Storage
+                        mImageUrl = downloadUri.toString();
+                    } else {
+                        Toast.makeText(getContext(), "upload failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 }
