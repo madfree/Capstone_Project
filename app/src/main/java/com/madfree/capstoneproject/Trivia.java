@@ -26,6 +26,17 @@ public class Trivia {
         this.difficulty = difficulty;
     }
 
+    public Trivia(String question, String answer, String wrong_answer_1, String wrong_answer_2,
+                  String wrong_answer_3, String category, String difficulty) {
+        this.question = question;
+        this.answer = answer;
+        this.wrong_answer_1 = wrong_answer_1;
+        this.wrong_answer_2 = wrong_answer_2;
+        this.wrong_answer_3 = wrong_answer_3;
+        this.category = category;
+        this.difficulty = difficulty;
+    }
+
     public String getQuestion() {
         return question;
     }

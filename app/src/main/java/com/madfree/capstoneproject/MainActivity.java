@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import timber.log.Timber;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,14 +16,13 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.BuildConfig;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private static final String TAG = "MainActivity";
 
     private static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -91,8 +96,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+                Timber.d("Sign in successful");
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in cancelled!", Toast.LENGTH_SHORT).show();
+                Timber.d("Sign in cancelled");
                 finish();
             }
         }
