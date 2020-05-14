@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.WrapperListAdapter;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,11 +28,18 @@ import com.google.firebase.storage.UploadTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 
 public class SubmitFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+
+    public static final String KEY_IMAGE_URI = "image_uri";
 
     public static final int DEFAULT_QUESTION_LENGTH = 300;
     public static final int DEFAULT_ANSWER_LENGTH = 30;
@@ -64,6 +72,8 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mTriviaImageStorageReference;
 
+    private Data mImageUploadInputData;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -85,18 +95,6 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mCategorySpinner = view.findViewById(R.id.spinner_category);
         mDifficultySpinner = view.findViewById(R.id.spinner_difficulty);
 
-        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // method to upload photo for a trivia question
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Pick an image"), RC_PHOTO_PICKER);
-                Timber.d("Image was selected");
-            }
-        });
-
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.
                 createFromResource(view.getContext(), R.array.category_array, android.R.layout.simple_spinner_item);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -114,38 +112,73 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mWrong1EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
         mWrong2EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
         mWrong3EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
-
         mSubmitButton = view.findViewById(R.id.button_submit);
+
+        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // method to upload photo for a trivia question
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Pick an image"), RC_PHOTO_PICKER);
+                Timber.d("Image was selected");
+            }
+        });
+
+
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (hasImage) {
-                    // TODO: First upload image and give back downloadUrl, then send trivia data to database
-                    Trivia mNewTrivia = new Trivia(
-                            mQuestionEditText.getText().toString(),
-                            mAnswerEditText.getText().toString(),
-                            mWrong1EditText.getText().toString(),
-                            mWrong2EditText.getText().toString(),
-                            mWrong3EditText.getText().toString(),
-                            mImageUrl,
-                            mSelectedCategory,
-                            mSelectedDifficulty
-                    );
-                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
-                } else {
-                    //submit trivia data without image
-                    Trivia mNewTrivia = new Trivia(
-                            mQuestionEditText.getText().toString(),
-                            mAnswerEditText.getText().toString(),
-                            mWrong1EditText.getText().toString(),
-                            mWrong2EditText.getText().toString(),
-                            mWrong3EditText.getText().toString(),
-                            mSelectedCategory,
-                            mSelectedDifficulty
-                    );
-                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
-                }
+                WorkManager mWorkManager = WorkManager.getInstance(getActivity());
+
+                OneTimeWorkRequest mUploadImageRequest = new OneTimeWorkRequest.Builder(UploadImageWorker.class)
+                        .setInputData(mImageUploadInputData)
+                        .build();
+
+                mWorkManager.enqueue(mUploadImageRequest);
+
+                mWorkManager.getWorkInfoByIdLiveData(mUploadImageRequest.getId())
+                        .observe(getActivity(), new Observer<WorkInfo>() {
+                            @Override
+                            public void onChanged(WorkInfo workInfo) {
+                                if (workInfo != null) {
+                                    if (workInfo.getState().isFinished()) {
+                                        mImageUrl = workInfo.getOutputData().getString(UploadImageWorker.KEY_FIREBASE_IMAGE_URL);
+                                        Timber.d("This is the firebase image url%s ", mImageUrl);
+                                    }
+                                }
+                            }
+                        });
+
+//                if (hasImage) {
+
+//                    // TODO: First upload image and give back downloadUrl, then send trivia data to database
+//                    Trivia mNewTrivia = new Trivia(
+//                            mQuestionEditText.getText().toString(),
+//                            mAnswerEditText.getText().toString(),
+//                            mWrong1EditText.getText().toString(),
+//                            mWrong2EditText.getText().toString(),
+//                            mWrong3EditText.getText().toString(),
+//                            mImageUrl,
+//                            mSelectedCategory,
+//                            mSelectedDifficulty
+//                    );
+//                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
+//                } else {
+//                    //submit trivia data without image
+//                    Trivia mNewTrivia = new Trivia(
+//                            mQuestionEditText.getText().toString(),
+//                            mAnswerEditText.getText().toString(),
+//                            mWrong1EditText.getText().toString(),
+//                            mWrong2EditText.getText().toString(),
+//                            mWrong3EditText.getText().toString(),
+//                            mSelectedCategory,
+//                            mSelectedDifficulty
+//                    );
+//                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
+//                }
             }
         });
 
@@ -174,35 +207,9 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-            selectedImageUri = data.getData();
-
-            // TODO: move this to another method that uploads image when submit button gets clicked
-            // get the image reference
-            final StorageReference imageRef = mTriviaImageStorageReference.child(selectedImageUri.getLastPathSegment());
-            // upload the image to Firebase
-            imageRef.putFile(selectedImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return imageRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "image successfully uploaded", Toast.LENGTH_SHORT).show();
-                        Timber.d("Image was successfully uploaded to Firebase");
-                        Uri downloadUri = task.getResult();
-                        // set the mImageUrl Variable to the downloadUri from Firebase Storage
-                        mImageUrl = downloadUri.toString();
-                        Timber.d(("URl of the image is: " + mImageUrl));
-                    } else {
-                        Toast.makeText(getContext(), "upload failed", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            mImageUploadInputData = new Data.Builder()
+                    .putString(KEY_IMAGE_URI, data.getData().toString())
+                    .build();
         }
     }
 }
