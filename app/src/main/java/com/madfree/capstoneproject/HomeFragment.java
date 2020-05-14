@@ -5,13 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import timber.log.Timber;
 
 public class HomeFragment extends Fragment {
+
+    private Button playButton;
 
     @Nullable
     @Override
@@ -19,6 +23,8 @@ public class HomeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        playButton = view.findViewById(R.id.button_play);
 
         Spinner categorySpinner = view.findViewById(R.id.spinner_category);
         ArrayAdapter categoryAdapter = ArrayAdapter.
@@ -31,6 +37,13 @@ public class HomeFragment extends Fragment {
                 createFromResource(view.getContext(), R.array.difficulty_array, android.R.layout.simple_spinner_item);
         difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         difficultySpinner.setAdapter(difficultyAdapter);
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Timber.d(("No functionality here yet"));
+            }
+        });
 
         return view;
     }

@@ -193,7 +193,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
                         Toast.makeText(getContext(), "image successfully uploaded", Toast.LENGTH_SHORT).show();
-                        Timber.d("Image was successfully upload to Firebase");
+                        Timber.d("Image was successfully uploaded to Firebase");
                         Uri downloadUri = task.getResult();
                         // set the mImageUrl Variable to the downloadUri from Firebase Storage
                         mImageUrl = downloadUri.toString();
