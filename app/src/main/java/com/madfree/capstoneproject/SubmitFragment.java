@@ -14,24 +14,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.WrapperListAdapter;
-
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
+import androidx.work.OverwritingInputMerger;
 import androidx.work.WorkManager;
 import timber.log.Timber;
 
@@ -39,21 +34,24 @@ import static android.app.Activity.RESULT_OK;
 
 public class SubmitFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    public static final String KEY_IMAGE_URI = "image_uri";
+    private static final String KEY_IMAGE_URI = "image_uri";
+    private static final String KEY_QUESTION_STRING = "question_string";
+    private static final String KEY_CORRECT_ANSWER_STRING = "correct_answer_string";
+    private static final String KEY_WRONG_ANSWER_1_STRING = "wrong_answer_1_string";
+    private static final String KEY_WRONG_ANSWER_2_STRING = "wrong_answer_2_string";
+    private static final String KEY_WRONG_ANSWER_3_STRING = "wrong_answer_3_string";
+    private static final String KEY_CATEGORY_STRING = "category_string";
+    private static final String KEY_DIFFICULTY_STRING = "difficulty_string";
 
-    public static final int DEFAULT_QUESTION_LENGTH = 300;
-    public static final int DEFAULT_ANSWER_LENGTH = 30;
-    public static final int RC_PHOTO_PICKER = 2;
+    private static final int DEFAULT_QUESTION_LENGTH = 300;
+    private static final int DEFAULT_ANSWER_LENGTH = 30;
+    private static final int RC_PHOTO_PICKER = 2;
 
     private String mSelectedCategory;
     private String mSelectedDifficulty;
-    private String mImageUrl;
-
-    private Uri selectedImageUri;
 
     // TODO: Implement method to check if all fields are filled before submit button is activated
     private boolean isEveryFieldFilled;
-    private boolean hasImage;
 
     private EditText mQuestionEditText;
     private EditText mAnswerEditText;
@@ -67,22 +65,12 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     private ImageButton mPhotoPickerButton;
     private Button mSubmitButton;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mTriviaDatabaseReference;
-    private FirebaseStorage mFirebaseStorage;
-    private StorageReference mTriviaImageStorageReference;
-
     private Data mImageUploadInputData;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTriviaDatabaseReference = mFirebaseDatabase.getReference().child("trivia");
-        mFirebaseStorage = mFirebaseStorage.getInstance();
-        mTriviaImageStorageReference = mFirebaseStorage.getReference().child("trivia_images");
 
         View view = inflater.inflate(R.layout.fragment_submit, container, false);
 
@@ -126,59 +114,27 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
             }
         });
 
-
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                WorkManager mWorkManager = WorkManager.getInstance(getActivity());
+                Data triviaTextData = new Data.Builder()
+                        .putString(KEY_QUESTION_STRING, mQuestionEditText.getText().toString())
+                        .putString(KEY_CORRECT_ANSWER_STRING, mAnswerEditText.getText().toString())
+                        .putString(KEY_WRONG_ANSWER_1_STRING, mWrong1EditText.getText().toString())
+                        .putString(KEY_WRONG_ANSWER_2_STRING, mWrong2EditText.getText().toString())
+                        .putString(KEY_WRONG_ANSWER_3_STRING, mWrong3EditText.getText().toString())
+                        .putString(KEY_CATEGORY_STRING, mSelectedCategory)
+                        .putString(KEY_DIFFICULTY_STRING, mSelectedDifficulty)
+                        .build();
 
-                OneTimeWorkRequest mUploadImageRequest = new OneTimeWorkRequest.Builder(UploadImageWorker.class)
+                OneTimeWorkRequest uploadImageRequest = new OneTimeWorkRequest.Builder(UploadImageWorker.class)
                         .setInputData(mImageUploadInputData)
                         .build();
 
-                mWorkManager.enqueue(mUploadImageRequest);
-
-                mWorkManager.getWorkInfoByIdLiveData(mUploadImageRequest.getId())
-                        .observe(getActivity(), new Observer<WorkInfo>() {
-                            @Override
-                            public void onChanged(WorkInfo workInfo) {
-                                if (workInfo != null) {
-                                    if (workInfo.getState().isFinished()) {
-                                        mImageUrl = workInfo.getOutputData().getString(UploadImageWorker.KEY_FIREBASE_IMAGE_URL);
-                                        Timber.d("This is the firebase image url%s ", mImageUrl);
-                                    }
-                                }
-                            }
-                        });
-
-//                if (hasImage) {
-
-//                    // TODO: First upload image and give back downloadUrl, then send trivia data to database
-//                    Trivia mNewTrivia = new Trivia(
-//                            mQuestionEditText.getText().toString(),
-//                            mAnswerEditText.getText().toString(),
-//                            mWrong1EditText.getText().toString(),
-//                            mWrong2EditText.getText().toString(),
-//                            mWrong3EditText.getText().toString(),
-//                            mImageUrl,
-//                            mSelectedCategory,
-//                            mSelectedDifficulty
-//                    );
-//                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
-//                } else {
-//                    //submit trivia data without image
-//                    Trivia mNewTrivia = new Trivia(
-//                            mQuestionEditText.getText().toString(),
-//                            mAnswerEditText.getText().toString(),
-//                            mWrong1EditText.getText().toString(),
-//                            mWrong2EditText.getText().toString(),
-//                            mWrong3EditText.getText().toString(),
-//                            mSelectedCategory,
-//                            mSelectedDifficulty
-//                    );
-//                    mTriviaDatabaseReference.push().setValue(mNewTrivia);
-//                }
+                OneTimeWorkRequest collectTriviaDataRequest = new OneTimeWorkRequest.Builder(CollectTriviaDataWorker.class)
+                        .setInputData(triviaTextData)
+                        .build();
             }
         });
 
