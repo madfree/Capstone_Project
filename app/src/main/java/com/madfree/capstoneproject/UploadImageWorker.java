@@ -12,7 +12,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.net.URL;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -28,7 +30,7 @@ public class UploadImageWorker extends Worker {
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mTriviaImageStorageReference;
 
-    private String mImageUrl;
+    private Data mOutputData;
 
     public UploadImageWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -41,16 +43,15 @@ public class UploadImageWorker extends Worker {
         mFirebaseStorage = mFirebaseStorage.getInstance();
         mTriviaImageStorageReference = mFirebaseStorage.getReference().child("trivia_images");
 
+        CountDownLatch countDown = new CountDownLatch(2);
         Uri imageUri = Uri.parse(getInputData().getString(KEY_IMAGE_URI));
 
         try {
-            if (TextUtils.isEmpty(imageUri.toString())) {
-            Timber.e("Invalid input uri");
-            throw new IllegalArgumentException("Invalid input uri");
-        }
 
         // get the image reference
         final StorageReference imageRef = mTriviaImageStorageReference.child(imageUri.getLastPathSegment());
+        Timber.d("This is the Firebase Storage reference to the image :%s", imageRef);
+
         // upload the image to Firebase
         imageRef.putFile(imageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
@@ -58,6 +59,7 @@ public class UploadImageWorker extends Worker {
                 if (!task.isSuccessful()) {
                     throw task.getException();
                 }
+                countDown.countDown();
                 return imageRef.getDownloadUrl();
             }
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -68,21 +70,21 @@ public class UploadImageWorker extends Worker {
                     Timber.d("Image was successfully uploaded to Firebase");
                     Uri downloadUri = task.getResult();
                     // set the mImageUrl Variable to the downloadUri from Firebase Storage
-                    // TODO: Worker won't wait for Firebase to finish upload. Adapt method to wait for continueWithTask to finish, before finishing Worker
-                    mImageUrl = downloadUri.toString();
-                    Timber.d(("URl of the image is: " + mImageUrl));
+                    String imageUrl = downloadUri.toString();
+                    Timber.d(("URl of the image is: " + imageUrl));
+                    mOutputData = new Data.Builder()
+                            .putString(KEY_FIREBASE_IMAGE_URL, imageUrl)
+                            .build();
+                    countDown.countDown();
                 } else {
                     Toast.makeText(getApplicationContext(), "upload failed", Toast.LENGTH_SHORT).show();
+                    countDown.countDown();
                 }
             }
         });
-
-        Data outputData = new Data.Builder()
-                .putString(KEY_FIREBASE_IMAGE_URL, mImageUrl)
-                .build();
-
         // If there were no errors, return SUCCESS and the image URL in Firebase as outPutData
-        return Result.success(outputData);
+        countDown.await();
+        return Result.success(mOutputData);
 
         } catch (Throwable throwable) {
             Timber.e(throwable, "Error uploading image");
