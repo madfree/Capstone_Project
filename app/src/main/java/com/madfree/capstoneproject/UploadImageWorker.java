@@ -2,7 +2,6 @@ package com.madfree.capstoneproject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -12,9 +11,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.net.URL;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -24,8 +21,8 @@ import timber.log.Timber;
 
 public class UploadImageWorker extends Worker {
 
-    public static final String KEY_IMAGE_URI = "image_uri";
-    public static final String KEY_FIREBASE_IMAGE_URL = "firebase_image_url";
+    private static final String KEY_IMAGE_URI = "image_uri";
+    private static final String KEY_FIREBASE_IMAGE_URL = "firebase_image_url";
 
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mTriviaImageStorageReference;
