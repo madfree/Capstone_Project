@@ -135,6 +135,15 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
                 OneTimeWorkRequest collectTriviaDataRequest = new OneTimeWorkRequest.Builder(CollectTriviaDataWorker.class)
                         .setInputData(triviaTextData)
                         .build();
+
+                OneTimeWorkRequest sendTriviaToDatabaseRequest = new OneTimeWorkRequest.Builder(SendTriviaToDbWorker.class)
+                        .setInputMerger(OverwritingInputMerger.class)
+                        .build();
+
+                WorkManager.getInstance(getActivity())
+                        .beginWith(Arrays.asList(uploadImageRequest, collectTriviaDataRequest))
+                        .then(sendTriviaToDatabaseRequest)
+                        .enqueue();
             }
         });
 
