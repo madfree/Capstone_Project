@@ -21,9 +21,6 @@ import timber.log.Timber;
 
 public class UploadImageWorker extends Worker {
 
-    private static final String KEY_IMAGE_URI = "image_uri";
-    private static final String KEY_FIREBASE_IMAGE_URL = "firebase_image_url";
-
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mTriviaImageStorageReference;
 
@@ -31,7 +28,6 @@ public class UploadImageWorker extends Worker {
 
     public UploadImageWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-
     }
 
     @NonNull
@@ -41,7 +37,7 @@ public class UploadImageWorker extends Worker {
         mTriviaImageStorageReference = mFirebaseStorage.getReference().child("trivia_images");
 
         CountDownLatch countDown = new CountDownLatch(2);
-        Uri imageUri = Uri.parse(getInputData().getString(KEY_IMAGE_URI));
+        Uri imageUri = Uri.parse(getInputData().getString(Constants.KEY_IMAGE_URI));
 
         try {
 
@@ -70,7 +66,7 @@ public class UploadImageWorker extends Worker {
                     String imageUrl = downloadUri.toString();
                     Timber.d(("URl of the image is: " + imageUrl));
                     mOutputData = new Data.Builder()
-                            .putString(KEY_FIREBASE_IMAGE_URL, imageUrl)
+                            .putString(Constants.KEY_FIREBASE_IMAGE_URL, imageUrl)
                             .build();
                     countDown.countDown();
                 } else {

@@ -23,9 +23,6 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int RC_SIGN_IN = 1;
-    public static final String ANONYMOUS = "anonymous";
-
     private String mUserName;
 
     // Firebase Instance Variables
@@ -72,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mUserName = user.getDisplayName();
                 } else {
                     // user is not signed in
-                    mUserName = ANONYMOUS;
+                    mUserName = Constants.ANONYMOUS;
                     startActivityForResult(
                             AuthUI.getInstance()
                             .createSignInIntentBuilder()
@@ -81,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     new AuthUI.IdpConfig.GoogleBuilder().build(),
                                     new AuthUI.IdpConfig.EmailBuilder().build()))
                             .build(),
-                            RC_SIGN_IN);
+                            Constants.RC_SIGN_IN);
                 }
             }
         };
@@ -90,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == Constants.RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
                 Timber.d("Sign in successful");

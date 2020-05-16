@@ -29,19 +29,6 @@ import static android.app.Activity.RESULT_OK;
 
 public class SubmitFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private static final String KEY_IMAGE_URI = "image_uri";
-    private static final String KEY_QUESTION_STRING = "question_string";
-    private static final String KEY_CORRECT_ANSWER_STRING = "correct_answer_string";
-    private static final String KEY_WRONG_ANSWER_1_STRING = "wrong_answer_1_string";
-    private static final String KEY_WRONG_ANSWER_2_STRING = "wrong_answer_2_string";
-    private static final String KEY_WRONG_ANSWER_3_STRING = "wrong_answer_3_string";
-    private static final String KEY_CATEGORY_STRING = "category_string";
-    private static final String KEY_DIFFICULTY_STRING = "difficulty_string";
-
-    private static final int DEFAULT_QUESTION_LENGTH = 300;
-    private static final int DEFAULT_ANSWER_LENGTH = 30;
-    private static final int RC_PHOTO_PICKER = 2;
-
     private String mSelectedCategory;
     private String mSelectedDifficulty;
 
@@ -90,11 +77,11 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mDifficultySpinner.setAdapter(difficultyAdapter);
         mDifficultySpinner.setOnItemSelectedListener(this);
 
-        mQuestionEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_QUESTION_LENGTH)});
-        mAnswerEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
-        mWrong1EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
-        mWrong2EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
-        mWrong3EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_ANSWER_LENGTH)});
+        mQuestionEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_QUESTION_LENGTH)});
+        mAnswerEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_ANSWER_LENGTH)});
+        mWrong1EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_ANSWER_LENGTH)});
+        mWrong2EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_ANSWER_LENGTH)});
+        mWrong3EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_ANSWER_LENGTH)});
         mSubmitButton = view.findViewById(R.id.button_submit);
 
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +91,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Pick an image"), RC_PHOTO_PICKER);
+                startActivityForResult(Intent.createChooser(intent, "Pick an image"), Constants.RC_PHOTO_PICKER);
                 Timber.d("Image was selected");
             }
         });
@@ -114,13 +101,13 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
             public void onClick(View view) {
 
                 Data triviaTextData = new Data.Builder()
-                        .putString(KEY_QUESTION_STRING, mQuestionEditText.getText().toString())
-                        .putString(KEY_CORRECT_ANSWER_STRING, mAnswerEditText.getText().toString())
-                        .putString(KEY_WRONG_ANSWER_1_STRING, mWrong1EditText.getText().toString())
-                        .putString(KEY_WRONG_ANSWER_2_STRING, mWrong2EditText.getText().toString())
-                        .putString(KEY_WRONG_ANSWER_3_STRING, mWrong3EditText.getText().toString())
-                        .putString(KEY_CATEGORY_STRING, mSelectedCategory)
-                        .putString(KEY_DIFFICULTY_STRING, mSelectedDifficulty)
+                        .putString(Constants.KEY_QUESTION_STRING, mQuestionEditText.getText().toString())
+                        .putString(Constants.KEY_CORRECT_ANSWER_STRING, mAnswerEditText.getText().toString())
+                        .putString(Constants.KEY_WRONG_ANSWER_1_STRING, mWrong1EditText.getText().toString())
+                        .putString(Constants.KEY_WRONG_ANSWER_2_STRING, mWrong2EditText.getText().toString())
+                        .putString(Constants.KEY_WRONG_ANSWER_3_STRING, mWrong3EditText.getText().toString())
+                        .putString(Constants.KEY_CATEGORY_STRING, mSelectedCategory)
+                        .putString(Constants.KEY_DIFFICULTY_STRING, mSelectedDifficulty)
                         .build();
 
                 OneTimeWorkRequest uploadImageRequest = new OneTimeWorkRequest.Builder(UploadImageWorker.class)
@@ -166,9 +153,9 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+        if (requestCode == Constants.RC_PHOTO_PICKER && resultCode == RESULT_OK) {
             mImageUploadInputData = new Data.Builder()
-                    .putString(KEY_IMAGE_URI, data.getData().toString())
+                    .putString(Constants.KEY_IMAGE_URI, data.getData().toString())
                     .build();
         }
     }
