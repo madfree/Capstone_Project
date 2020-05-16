@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/text_view_question_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1/10"
+        android:textSize="24sp"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/text_view_timer_countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="30"
+        android:textSize="24sp"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_timer_black"
+        android:paddingEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/text_view_timer_countdown"
+        app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown"
+        app:layout_constraintEnd_toStartOf="@id/text_view_timer_countdown"
+        />
+
+    <RelativeLayout
+        android:id="@+id/question_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_question_count">
+
+        <ImageView
+            android:id="@+id/image_view_question"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="20dp"
+            android:scaleType="centerCrop"
+            android:src=""
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <TextView
+            android:id="@+id/text_view_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="A sample question?"
+            android:textAlignment="center"
+            android:textSize="22sp"
+            android:layout_below="@id/image_view_question"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/answer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|bottom"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/question_layout"
+        app:layout_constraintVertical_bias="0.9">
+
+        <Button
+            android:id="@+id/button_answer_1"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:text="answer 1" />
+
+        <Button
+            android:id="@+id/button_answer_2"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/button_answer_1"
+            android:text="answer 2" />
+
+        <Button
+            android:id="@+id/button_answer_3"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_below="@id/button_answer_2"
+            android:text="answer 3" />
+
+        <Button
+            android:id="@+id/button_answer_4"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_below="@id/button_answer_2"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/button_answer_3"
+            android:text="answer 4" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
