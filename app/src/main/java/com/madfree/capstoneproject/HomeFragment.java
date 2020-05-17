@@ -1,5 +1,6 @@
 package com.madfree.capstoneproject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import timber.log.Timber;
 
 public class HomeFragment extends Fragment {
@@ -41,7 +44,10 @@ public class HomeFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Timber.d(("No functionality here yet"));
+                Fragment quizFragment = new QuizFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, quizFragment);
+                transaction.commit();
             }
         });
 

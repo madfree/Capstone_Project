@@ -11,6 +11,9 @@ public class Trivia {
     private String category;
     private String difficulty;
 
+    public Trivia() {
+    }
+
     public Trivia(String question, String answer, String wrong_answer_1, String wrong_answer_2,
                   String wrong_answer_3, String image_url, String category, String difficulty) {
         this.question = question;
