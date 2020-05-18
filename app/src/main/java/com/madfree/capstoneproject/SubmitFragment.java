@@ -122,7 +122,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
                         .setInputMerger(OverwritingInputMerger.class)
                         .build();
 
-                WorkManager.getInstance(getActivity())
+                WorkManager.getInstance(requireActivity())
                         .beginWith(Arrays.asList(uploadImageRequest, collectTriviaDataRequest))
                         .then(sendTriviaToDatabaseRequest)
                         .enqueue();

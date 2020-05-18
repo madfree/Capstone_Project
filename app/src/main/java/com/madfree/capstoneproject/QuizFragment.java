@@ -8,21 +8,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
 
-public class QuizFragment extends Fragment {
+public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private ImageView question_image_view;
 
@@ -34,10 +31,15 @@ public class QuizFragment extends Fragment {
     private Button question_answer_3;
     private Button question_answer_4;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mTriviaDatabaseReference;
+    private List<Trivia> mTriviaList = new ArrayList<>();
+    private int triviaCountTotal;
+    private int triviaCounter;
+    private Trivia currentTrivia;
 
-    List<Trivia> mTriviaList = new ArrayList<>();
+    private int score;
+
+    private boolean isAnswered;
+
 
     @Nullable
     @Override
@@ -56,42 +58,78 @@ public class QuizFragment extends Fragment {
         question_answer_3 = view.findViewById(R.id.button_answer_3);
         question_answer_4 = view.findViewById(R.id.button_answer_4);
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTriviaDatabaseReference = mFirebaseDatabase.getReference().child("trivia");
+        QuizViewModel quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
 
-        ChildEventListener mTriviaListener = new ChildEventListener() {
+        quizViewModel.getTrivia().observe(this, new Observer<List<Trivia>>() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Timber.d("Found trivia: " + dataSnapshot.getKey());
-                Trivia trivia = dataSnapshot.getValue(Trivia.class);
-                mTriviaList.add(trivia);
-                Timber.d("This is the number of trivia in the db: " + mTriviaList.size());
+            public void onChanged(List<Trivia> trivias) {
+                mTriviaList.addAll(trivias);
+                triviaCountTotal = mTriviaList.size();
+                Timber.d("There are " + mTriviaList.size() + " trivia in the list.");
+                Collections.shuffle(mTriviaList);
+                showNextQuestion();
             }
+        });
+        return view;
+    }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+    private void showNextQuestion() {
+        Timber.d("Getting the next question");
 
-            }
+        if (triviaCounter < triviaCountTotal) {
+            Timber.d("Current trivia number is: " + triviaCounter);
+            currentTrivia = mTriviaList.get(triviaCounter);
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            List<String> answerList = new ArrayList<>();
+            answerList.add(currentTrivia.getAnswer());
+            answerList.add(currentTrivia.getWrong_answer_1());
+            answerList.add(currentTrivia.getWrong_answer_2());
+            answerList.add(currentTrivia.getWrong_answer_3());
+            Collections.shuffle(answerList);
 
-            }
+            questions_count.setText(triviaCounter+1 + "/10");
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            question_image_view.setVisibility(View.GONE);
+            question_text_view.setText(currentTrivia.getQuestion());
+            question_answer_1.setText(answerList.get(0));
+            question_answer_2.setText(answerList.get(1));
+            question_answer_3.setText(answerList.get(2));
+            question_answer_4.setText(answerList.get(3));
 
-            }
+            question_answer_1.setOnClickListener(this);
+            question_answer_2.setOnClickListener(this);
+            question_answer_3.setOnClickListener(this);
+            question_answer_4.setOnClickListener(this);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            triviaCounter++;
+            isAnswered = false;
+        } else {
+            finishQuiz();
+        }
+    }
 
-            }
-        };
-        mTriviaDatabaseReference.addChildEventListener(mTriviaListener);
+    private void finishQuiz() {
+        // show result screen
+    }
 
+    @Override
+    public void onClick(View view) {
+        isAnswerCorrect(view);
+        showNextQuestion();
+    }
 
+    private boolean isAnswerCorrect(View view) {
+        isAnswered = true;
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        Button selectedButton = (Button) view;
+        String answerText = selectedButton.getText().toString();
+
+        if (answerText.equals(currentTrivia.getAnswer())) {
+            score+=10;
+            Timber.d("Score is now: " + score);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
