@@ -1,16 +1,20 @@
 package com.madfree.capstoneproject;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,8 +27,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private ImageView question_image_view;
 
-    private TextView questions_count;
-    private TextView countdown_timer;
+    private TextView questions_count_text_view;
+    private TextView countdown_timer_text_view;
     private TextView question_text_view;
     private Button question_answer_1;
     private Button question_answer_2;
@@ -35,6 +39,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private int triviaCountTotal;
     private int triviaCounter;
     private Trivia currentTrivia;
+
+    private CountDownTimer countDownTimer;
+    private long timeLeftInMillis;
 
     private int score;
 
@@ -47,8 +54,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
-        questions_count = view.findViewById(R.id.text_view_question_count);
-        countdown_timer = view.findViewById(R.id.text_view_timer_countdown);
+        questions_count_text_view = view.findViewById(R.id.text_view_question_count);
+        countdown_timer_text_view = view.findViewById(R.id.text_view_timer_countdown);
 
         question_text_view = view.findViewById(R.id.text_view_question);
         question_image_view = view.findViewById(R.id.image_view_question);
@@ -70,6 +77,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                 showNextQuestion();
             }
         });
+
+        timeLeftInMillis = Constants.COUNTDOWN_IN_MILLIS;
+        startCountDown();
         return view;
     }
 
@@ -87,7 +97,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             answerList.add(currentTrivia.getWrong_answer_3());
             Collections.shuffle(answerList);
 
-            questions_count.setText(triviaCounter+1 + "/10");
+            questions_count_text_view.setText(triviaCounter+1 + "/10");
 
             question_image_view.setVisibility(View.GONE);
             question_text_view.setText(currentTrivia.getQuestion());
@@ -103,13 +113,46 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
             triviaCounter++;
             isAnswered = false;
+
         } else {
             finishQuiz();
         }
     }
 
+    private void startCountDown() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateCountDownText();
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeftInMillis = 0;
+                updateCountDownText();
+                finishQuiz();
+            }
+        }.start();
+    }
+
+    private void updateCountDownText() {
+        int minutes = (int) (timeLeftInMillis / 1000) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+
+        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        countdown_timer_text_view.setText(timeFormatted);
+
+        if (timeLeftInMillis < 10000) {
+            countdown_timer_text_view.setTextColor(Color.RED);
+        } else {
+            countdown_timer_text_view.setTextColor(Color.BLACK);
+        }
+    }
+
     private void finishQuiz() {
         // show result screen
+        Toast.makeText(getActivity(), "Quiz is finished", Toast.LENGTH_SHORT).show();
     }
 
     @Override

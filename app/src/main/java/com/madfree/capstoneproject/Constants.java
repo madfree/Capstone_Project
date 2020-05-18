@@ -22,4 +22,7 @@ public class Constants {
 
     public static final int DEFAULT_QUESTION_LENGTH = 300;
     public static final int DEFAULT_ANSWER_LENGTH = 30;
+
+    // Quiz
+    public static final long COUNTDOWN_IN_MILLIS = 30000;
 }
