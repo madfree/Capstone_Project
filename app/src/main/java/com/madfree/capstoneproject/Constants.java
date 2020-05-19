@@ -25,4 +25,5 @@ public class Constants {
 
     // Quiz
     public static final long COUNTDOWN_IN_MILLIS = 30000;
+    public static final int  QUIZ_MAX_SIZE = 10;
 }

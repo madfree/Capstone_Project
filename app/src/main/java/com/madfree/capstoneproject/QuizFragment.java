@@ -43,10 +43,21 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis;
 
+    private String selectedCategory;
+    private String selectedDifficulty;
     private int score;
 
     private boolean isAnswered;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
+        Timber.d("This is the category: " + selectedCategory);
+        selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
+        Timber.d("This is the category: " + selectedDifficulty);
+    }
 
     @Nullable
     @Override
@@ -67,7 +78,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         QuizViewModel quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
 
-        quizViewModel.getTrivia().observe(this, new Observer<List<Trivia>>() {
+        quizViewModel.getTrivia(selectedCategory, selectedDifficulty).observe(this, new Observer<List<Trivia>>() {
             @Override
             public void onChanged(List<Trivia> trivias) {
                 mTriviaList.addAll(trivias);
@@ -97,7 +108,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             answerList.add(currentTrivia.getWrong_answer_3());
             Collections.shuffle(answerList);
 
-            questions_count_text_view.setText(triviaCounter+1 + "/10");
+            questions_count_text_view.setText(triviaCounter+1 + "/" + mTriviaList.size());
 
             question_image_view.setVisibility(View.GONE);
             question_text_view.setText(currentTrivia.getQuestion());
@@ -152,7 +163,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void finishQuiz() {
         // show result screen
-        Toast.makeText(getActivity(), "Quiz is finished", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Quiz is finished", Toast.LENGTH_SHORT).show();
     }
 
     @Override

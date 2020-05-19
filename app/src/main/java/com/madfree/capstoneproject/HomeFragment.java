@@ -19,6 +19,8 @@ import timber.log.Timber;
 public class HomeFragment extends Fragment {
 
     private Button playButton;
+    private String selectedCategory;
+    private String selectedDifficulty;
 
     @Nullable
     @Override
@@ -45,6 +47,13 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment quizFragment = new QuizFragment();
+                selectedCategory = categorySpinner.getSelectedItem().toString();
+                selectedDifficulty = difficultySpinner.getSelectedItem().toString();
+
+                Bundle args = new Bundle();
+                args.putString(Constants.KEY_CATEGORY_STRING, selectedCategory);
+                args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
+                quizFragment.setArguments(args);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, quizFragment);
                 transaction.commit();
