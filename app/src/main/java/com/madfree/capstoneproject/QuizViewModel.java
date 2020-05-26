@@ -63,7 +63,7 @@ public class QuizViewModel extends ViewModel {
     public LiveData<Integer> getCountLiveData() {
         Timber.d("Getting the current trivia number");
         if (mTriviaCountLiveData == null) {
-            mTriviaCountLiveData = new MutableLiveData<>(1);
+            mTriviaCountLiveData = new MutableLiveData<>(0);
         }
         return mTriviaCountLiveData;
     }
@@ -71,13 +71,17 @@ public class QuizViewModel extends ViewModel {
     public MutableLiveData<Integer> incrementCountLiveData() {
         triviaNumber = mTriviaCountLiveData.getValue();
         Timber.d("number from MutableLiveData is: %s", triviaNumber);
-        if (triviaNumber < mTriviaList.size()) {
+        if (triviaNumber < mTriviaList.size()-1) {
             triviaNumber++;
             Timber.d("Increment number count to: %s", triviaNumber);
             mTriviaCountLiveData.setValue(triviaNumber);
             Timber.d("MutableLiveData is now: %s", mTriviaCountLiveData.getValue());
         }
         return mTriviaCountLiveData;
+    }
+
+    public Trivia getCurrentTrivia() {
+        return mTriviaList.get(triviaNumber);
     }
 
     public void setSelectedCategory(String selectedCategory) {

@@ -19,7 +19,6 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
@@ -38,9 +37,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private Button question_answer_4;
 
     private QuizViewModel quizViewModel;
-    private List<Trivia> mTriviaList = new ArrayList<>();
-    private int triviaCountTotal;
-    private int triviaCounter;
     private Trivia currentTrivia;
 
     private CountDownTimer countDownTimer;
@@ -95,47 +91,34 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             public void onChanged(List<Trivia> trivias) {
                 Timber.d("Get size of trivia list from ViewModel: %s", trivias.size());
                 questions_count_text_view_total.setText(String.valueOf(trivias.size()));
+                updateUi();
             }
         });
 
         quizViewModel.getCountLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                Timber.d("Get number from ViewModel: " + integer);
+                Timber.d("Get number from ViewModel: %s", integer);
+                integer+=1;
                 String number = integer.toString();
                 questions_count_text_view.setText(number);
             }
         });
-
-
-//        LiveData<Trivia> triviaLiveData = quizViewModel.getmCurrentTriviaItem(triviaCounter);
-//        triviaLiveData.observe(getViewLifecycleOwner(), new Observer<Trivia>() {
-//            @Override
-//            public void onChanged(Trivia trivia) {
-//                updateUi(trivia);
-//            }
-//
-//        });
-
         return view;
     }
 
-    private void updateUi(Trivia currentTrivia) {
-        triviaCounter++;
-
-        Timber.d("Current trivia number is: " + triviaCounter);
+    private void updateUi() {
+        Trivia trivia = quizViewModel.getCurrentTrivia();
 
         List<String> answerList = new ArrayList<>();
-        answerList.add(currentTrivia.getAnswer());
-        answerList.add(currentTrivia.getWrong_answer_1());
-        answerList.add(currentTrivia.getWrong_answer_2());
-        answerList.add(currentTrivia.getWrong_answer_3());
+        answerList.add(trivia.getAnswer());
+        answerList.add(trivia.getWrong_answer_1());
+        answerList.add(trivia.getWrong_answer_2());
+        answerList.add(trivia.getWrong_answer_3());
         Collections.shuffle(answerList);
 
-        questions_count_text_view.setText(triviaCounter + "/" + mTriviaList.size());
-
         question_image_view.setVisibility(View.GONE);
-        question_text_view.setText(currentTrivia.getQuestion());
+        question_text_view.setText(trivia.getQuestion());
         question_answer_1.setText(answerList.get(0));
         question_answer_2.setText(answerList.get(1));
         question_answer_3.setText(answerList.get(2));
@@ -178,13 +161,14 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void finishQuiz() {
         // show result screen
-        Toast.makeText(getContext(), "Quiz is finished", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireView().getContext(), "Quiz is finished", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onClick(View view) {
 //        isAnswerCorrect(view);
         quizViewModel.incrementCountLiveData();
+        updateUi();
 
 //        if (triviaCounter < triviaCountTotal) {
 //            Timber.d("Getting the next question");
