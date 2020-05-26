@@ -19,6 +19,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
@@ -96,6 +97,26 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                 questions_count_text_view_total.setText(String.valueOf(trivias.size()));
             }
         });
+
+        quizViewModel.getCountLiveData().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                Timber.d("Get number from ViewModel: " + integer);
+                String number = integer.toString();
+                questions_count_text_view.setText(number);
+            }
+        });
+
+
+//        LiveData<Trivia> triviaLiveData = quizViewModel.getmCurrentTriviaItem(triviaCounter);
+//        triviaLiveData.observe(getViewLifecycleOwner(), new Observer<Trivia>() {
+//            @Override
+//            public void onChanged(Trivia trivia) {
+//                updateUi(trivia);
+//            }
+//
+//        });
+
         return view;
     }
 
@@ -162,13 +183,14 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        isAnswerCorrect(view);
-        if (triviaCounter < triviaCountTotal) {
-            //showNextQuestion();
-            Timber.d("Getting the next question");
-        } else {
-            finishQuiz();
-        }
+//        isAnswerCorrect(view);
+        quizViewModel.incrementCountLiveData();
+
+//        if (triviaCounter < triviaCountTotal) {
+//            Timber.d("Getting the next question");
+//        } else {
+//            finishQuiz();
+//        }
     }
 
     private boolean isAnswerCorrect(View view) {
