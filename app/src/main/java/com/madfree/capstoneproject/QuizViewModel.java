@@ -11,11 +11,17 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import timber.log.Timber;
 
 public class QuizViewModel extends ViewModel {
+
+    private LiveData<List<Trivia>> mTriviaLiveData;
+    private MutableLiveData<Integer> mTriviaCountLiveData;
+    private List<Trivia> mTriviaList;
+    private int triviaNumber;
     private String selectedCategory;
     private String selectedDifficulty;
 
@@ -29,26 +35,49 @@ public class QuizViewModel extends ViewModel {
     @NonNull
     public LiveData<List<Trivia>> getTriviaLiveData() {
         FirebaseQueryLiveData liveData = getTriviaData();
-        return Transformations.map(liveData, new Deserializer());
+        mTriviaLiveData = Transformations.map(liveData, new Deserializer());
+        return mTriviaLiveData;
     }
 
-    class Deserializer implements Function<DataSnapshot, List<Trivia>> {
+    private class Deserializer implements Function<DataSnapshot, List<Trivia>> {
         @Override
         public List<Trivia> apply(DataSnapshot dataSnapshot) {
-            Timber.d("Receiving data snapshot with this number of children: %s", dataSnapshot.getChildrenCount());
-            List<Trivia> triviaList = new ArrayList<>();
-            Timber.d("Initializing the trivia list");
-            for (DataSnapshot triviaSnapshot : dataSnapshot.getChildren()) {
-                Trivia trivia = triviaSnapshot.getValue(Trivia.class);
-                if (trivia.getDifficulty().equals(selectedDifficulty)) {
-                    triviaList.add(trivia);
-                    Timber.d("This is the question: %s", trivia.getQuestion());
-                    Timber.d("This is the number of trivia: %s", triviaList.size());
+            if (mTriviaList == null) {
+                mTriviaList = new ArrayList<>();
+                Timber.d("Receiving data snapshot with this number of children: %s", dataSnapshot.getChildrenCount());
+                Timber.d("Initializing the trivia list");
+                for (DataSnapshot triviaSnapshot : dataSnapshot.getChildren()) {
+                    Trivia trivia = triviaSnapshot.getValue(Trivia.class);
+                    if (trivia.getDifficulty().equals(selectedDifficulty)) {
+                        mTriviaList.add(trivia);
+                        Timber.d("This is the question: %s", trivia.getQuestion());
+                        Timber.d("This is the number of trivia: %s", mTriviaList.size());
+                    }
                 }
+                Timber.d("returning trivia list with items: %s", mTriviaList.size());
             }
-            Timber.d("returning trivia list with items: %s", triviaList.size());
-            return triviaList;
+            return mTriviaList;
         }
+    }
+
+    public LiveData<Integer> getCountLiveData() {
+        Timber.d("Getting the current trivia number");
+        if (mTriviaCountLiveData == null) {
+            mTriviaCountLiveData = new MutableLiveData<>(1);
+        }
+        return mTriviaCountLiveData;
+    }
+
+    public MutableLiveData<Integer> incrementCountLiveData() {
+        triviaNumber = mTriviaCountLiveData.getValue();
+        Timber.d("number from MutableLiveData is: %s", triviaNumber);
+        if (triviaNumber < mTriviaList.size()) {
+            triviaNumber++;
+            Timber.d("Increment number count to: %s", triviaNumber);
+            mTriviaCountLiveData.setValue(triviaNumber);
+            Timber.d("MutableLiveData is now: %s", mTriviaCountLiveData.getValue());
+        }
+        return mTriviaCountLiveData;
     }
 
     public void setSelectedCategory(String selectedCategory) {
