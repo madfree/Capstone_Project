@@ -39,33 +39,35 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private QuizViewModel quizViewModel;
     private Trivia currentTrivia;
 
+    private int mTriviaQuizSize;
+    private int mCurrentTriviaNumber;
+
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis;
 
     private String selectedCategory;
     private String selectedDifficulty;
-    private int score;
-
-    private boolean isAnswered;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
-        selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
-        quizViewModel.setSelectedCategory(selectedCategory);
-        Timber.d("This is the category: %s", selectedCategory);
-        selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
-        quizViewModel.setSelectedDifficulty(selectedDifficulty);
-        Timber.d("This is the category: %s", selectedDifficulty);
-
+        Timber.d("QuizFragment onCreate");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Timber.d("QuizFragment onCreateView");
+
+        quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
+        Timber.d("Initialize QuizViewModel");
+        selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
+        quizViewModel.setSelectedCategory(selectedCategory);
+        Timber.d("This is the category: %s", selectedCategory);
+        selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
+        quizViewModel.setSelectedDifficulty(selectedDifficulty);
+        Timber.d("This is the category: %s", selectedDifficulty);
 
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
@@ -86,50 +88,74 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_3.setOnClickListener(this);
         question_answer_4.setOnClickListener(this);
 
-        quizViewModel.getTriviaLiveData().observe(this, new Observer<List<Trivia>>() {
-            @Override
-            public void onChanged(List<Trivia> trivias) {
-                Timber.d("Get size of trivia list from ViewModel: %s", trivias.size());
-                questions_count_text_view_total.setText(String.valueOf(trivias.size()));
-                updateUi();
-            }
-        });
+        if (savedInstanceState == null) {
+            quizViewModel.getTriviaLiveData().observe(this, new Observer<List<Trivia>>() {
+                @Override
+                public void onChanged(List<Trivia> trivias) {
+                    Timber.d("Get size of trivia list from ViewModel: %s", trivias.size());
+                    mTriviaQuizSize = trivias.size();
+                    questions_count_text_view_total.setText(String.valueOf(mTriviaQuizSize));
+                    updateUi();
+                }
+            });
+        } else {
+            timeLeftInMillis = savedInstanceState.getLong(Constants.KEY_MILLIS_LEFT);
+            Timber.d("Restoring state " + timeLeftInMillis);
+            currentTrivia = quizViewModel.getCurrentTrivia();
+            startCountDown();
+        }
 
         quizViewModel.getCountLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 Timber.d("Get number from ViewModel: %s", integer);
-                integer+=1;
-                String number = integer.toString();
-                questions_count_text_view.setText(number);
+                questions_count_text_view.setText(String.valueOf(integer+1));
             }
         });
+
         return view;
     }
 
-    private void updateUi() {
-        Trivia trivia = quizViewModel.getCurrentTrivia();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Timber.d("Saving state " + timeLeftInMillis);
+        outState.putLong(Constants.KEY_MILLIS_LEFT, timeLeftInMillis);
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            Timber.d("Cancel the countdown timer");
+        }
+    }
+
+    private void updateUi() {
+        Timber.d("Setting up UI");
+        currentTrivia = quizViewModel.getCurrentTrivia();
         List<String> answerList = new ArrayList<>();
-        answerList.add(trivia.getAnswer());
-        answerList.add(trivia.getWrong_answer_1());
-        answerList.add(trivia.getWrong_answer_2());
-        answerList.add(trivia.getWrong_answer_3());
+        answerList.add(currentTrivia.getAnswer());
+        answerList.add(currentTrivia.getWrong_answer_1());
+        answerList.add(currentTrivia.getWrong_answer_2());
+        answerList.add(currentTrivia.getWrong_answer_3());
         Collections.shuffle(answerList);
 
         question_image_view.setVisibility(View.GONE);
-        question_text_view.setText(trivia.getQuestion());
+        question_text_view.setText(currentTrivia.getQuestion());
         question_answer_1.setText(answerList.get(0));
         question_answer_2.setText(answerList.get(1));
         question_answer_3.setText(answerList.get(2));
         question_answer_4.setText(answerList.get(3));
         timeLeftInMillis = Constants.COUNTDOWN_IN_MILLIS;
         startCountDown();
-        isAnswered = false;
+        Timber.d("Initialize count down timer");
     }
 
     private void startCountDown() {
         countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+
             @Override
             public void onTick(long millisUntilFinished) {
                 timeLeftInMillis = millisUntilFinished;
@@ -140,7 +166,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             public void onFinish() {
                 timeLeftInMillis = 0;
                 updateCountDownText();
-                finishQuiz();
+                checkAnswer(null);
             }
         }.start();
     }
@@ -166,29 +192,30 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-//        isAnswerCorrect(view);
-        quizViewModel.incrementCountLiveData();
-        updateUi();
-
-//        if (triviaCounter < triviaCountTotal) {
-//            Timber.d("Getting the next question");
-//        } else {
-//            finishQuiz();
-//        }
+        countDownTimer.cancel();
+        updateCountDownText();
+        checkAnswer(view);
     }
 
-    private boolean isAnswerCorrect(View view) {
-        isAnswered = true;
+    private void checkAnswer(View view) {
+        if (view != null) {
+            Button selectedButton = (Button) view;
+            String answerText = selectedButton.getText().toString();
 
-        Button selectedButton = (Button) view;
-        String answerText = selectedButton.getText().toString();
-
-        if (answerText.equals(currentTrivia.getAnswer())) {
-            score += 10;
-            Timber.d("Score is now: " + score);
-            return true;
-        } else {
-            return false;
+            if (answerText.equals(currentTrivia.getAnswer())) {
+                quizViewModel.updatemQuizeScoreLiveData();
+                Timber.d("Updating score");
+            }
         }
+        quizViewModel.canIncrementCountLiveData().observe(requireActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean quizIsFinished) {
+                if (quizIsFinished) {
+                    finishQuiz();
+                } else {
+                    updateUi();
+                }
+            }
+        });
     }
 }

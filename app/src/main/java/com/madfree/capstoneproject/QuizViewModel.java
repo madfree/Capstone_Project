@@ -20,6 +20,9 @@ public class QuizViewModel extends ViewModel {
 
     private LiveData<List<Trivia>> mTriviaLiveData;
     private MutableLiveData<Integer> mTriviaCountLiveData;
+    private MutableLiveData<Integer> mQuizeScoreLiveData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mQuizIsFinished = new MutableLiveData<>();
+    private int mQuizScore;
     private List<Trivia> mTriviaList;
     private int triviaNumber;
     private String selectedCategory;
@@ -68,7 +71,7 @@ public class QuizViewModel extends ViewModel {
         return mTriviaCountLiveData;
     }
 
-    public MutableLiveData<Integer> incrementCountLiveData() {
+    public MutableLiveData<Boolean> canIncrementCountLiveData() {
         triviaNumber = mTriviaCountLiveData.getValue();
         Timber.d("number from MutableLiveData is: %s", triviaNumber);
         if (triviaNumber < mTriviaList.size()-1) {
@@ -76,7 +79,14 @@ public class QuizViewModel extends ViewModel {
             Timber.d("Increment number count to: %s", triviaNumber);
             mTriviaCountLiveData.setValue(triviaNumber);
             Timber.d("MutableLiveData is now: %s", mTriviaCountLiveData.getValue());
+            mQuizIsFinished.setValue(false);
+        } else {
+            mQuizIsFinished.setValue(true);
         }
+        return mQuizIsFinished;
+    }
+
+    public MutableLiveData<Integer> getmTriviaCountLiveData() {
         return mTriviaCountLiveData;
     }
 
@@ -92,5 +102,15 @@ public class QuizViewModel extends ViewModel {
     public void setSelectedDifficulty(String selectedDifficulty) {
         Timber.d("Difficulty delivered to ViewModel: %s", selectedDifficulty);
         this.selectedDifficulty = selectedDifficulty;
+    }
+
+    public MutableLiveData<Integer> getmQuizeScoreLiveData() {
+        return mQuizeScoreLiveData;
+    }
+
+    public void updatemQuizeScoreLiveData() {
+        mQuizScore+=10;
+        mQuizeScoreLiveData.setValue(mQuizScore);
+        Timber.d("Score in QuizViewModel is now: " + mQuizScore);
     }
 }
