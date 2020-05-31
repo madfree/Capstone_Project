@@ -10,10 +10,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import timber.log.Timber;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,12 +33,17 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private String mUserName;
+    private String mUserEmail;
+    private Uri mUserImageUrl;
 
     // Firebase Instance Variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private DrawerLayout drawer;
+    private TextView mUserNameTextView;
+    private TextView mUserEmailTextView;
+    private ImageView mUserImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +58,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View navHeaderLayout = navigationView.getHeaderView(0);
+        mUserNameTextView = navHeaderLayout.findViewById(R.id.user_name_text_view);
+        mUserEmailTextView = navHeaderLayout.findViewById(R.id.user_email_text_view);
+        mUserImageView = navHeaderLayout.findViewById(R.id.user_image_view);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -67,7 +83,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
                 if (user != null) {
                     // the user is signed in
+                    mUserImageUrl = user.getPhotoUrl();
+                    Glide.with(MainActivity.this)
+                            .load(mUserImageUrl)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(mUserImageView);
                     mUserName = user.getDisplayName();
+                    mUserNameTextView.setText(mUserName);
+                    mUserEmail = user.getEmail();
+                    mUserEmailTextView.setText(mUserEmail);
                 } else {
                     // user is not signed in
                     mUserName = Constants.ANONYMOUS;
