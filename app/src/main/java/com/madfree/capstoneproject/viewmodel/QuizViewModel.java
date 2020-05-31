@@ -1,9 +1,11 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.viewmodel;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.madfree.capstoneproject.data.Trivia;
+import com.madfree.capstoneproject.data.FirebaseQueryLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class QuizViewModel extends ViewModel {
 
     private LiveData<List<Trivia>> mTriviaLiveData;
     private MutableLiveData<Integer> mTriviaCountLiveData;
-    private MutableLiveData<Integer> mQuizeScoreLiveData = new MutableLiveData<>();
+    private MutableLiveData<Integer> mQuizScoreLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> mQuizIsFinished = new MutableLiveData<>();
     private int mQuizScore;
     private List<Trivia> mTriviaList;
@@ -104,13 +106,13 @@ public class QuizViewModel extends ViewModel {
         this.selectedDifficulty = selectedDifficulty;
     }
 
-    public MutableLiveData<Integer> getmQuizeScoreLiveData() {
-        return mQuizeScoreLiveData;
+    public MutableLiveData<Integer> getmQuizScoreLiveData() {
+        return mQuizScoreLiveData;
     }
 
     public void updatemQuizeScoreLiveData() {
         mQuizScore+=10;
-        mQuizeScoreLiveData.setValue(mQuizScore);
+        mQuizScoreLiveData.setValue(mQuizScore);
         Timber.d("Score in QuizViewModel is now: " + mQuizScore);
     }
 }

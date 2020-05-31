@@ -1,4 +1,4 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +10,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.madfree.capstoneproject.util.Constants;
+import com.madfree.capstoneproject.viewmodel.QuizViewModel;
+import com.madfree.capstoneproject.R;
+import com.madfree.capstoneproject.data.Trivia;
 
 import java.util.ArrayList;
 import java.util.Collections;

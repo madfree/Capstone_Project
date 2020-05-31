@@ -1,4 +1,4 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+
+import com.madfree.capstoneproject.util.Constants;
+import com.madfree.capstoneproject.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

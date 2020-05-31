@@ -1,4 +1,4 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.madfree.capstoneproject.util.Constants;
+import com.madfree.capstoneproject.R;
+import com.madfree.capstoneproject.worker.CollectTriviaDataWorker;
+import com.madfree.capstoneproject.worker.SendTriviaToDbWorker;
+import com.madfree.capstoneproject.worker.UploadImageWorker;
 
 import java.util.Arrays;
 

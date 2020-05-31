@@ -1,4 +1,4 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.util;
 
 public class Constants {
 

@@ -1,4 +1,4 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.worker;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.madfree.capstoneproject.util.Constants;
 
 import java.util.concurrent.CountDownLatch;
 

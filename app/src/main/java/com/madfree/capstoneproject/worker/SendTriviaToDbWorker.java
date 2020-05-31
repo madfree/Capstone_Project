@@ -1,10 +1,12 @@
-package com.madfree.capstoneproject;
+package com.madfree.capstoneproject.worker;
 
 import android.content.Context;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.madfree.capstoneproject.util.Constants;
+import com.madfree.capstoneproject.data.Trivia;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
