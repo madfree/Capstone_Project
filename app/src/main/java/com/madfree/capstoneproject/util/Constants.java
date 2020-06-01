@@ -1,10 +1,14 @@
 package com.madfree.capstoneproject.util;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class Constants {
 
     // Auth
     public static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
+    public static final DatabaseReference USER_REF = FirebaseDatabase.getInstance().getReference("users");
 
     // Trivia image
     public static final int RC_PHOTO_PICKER = 2;

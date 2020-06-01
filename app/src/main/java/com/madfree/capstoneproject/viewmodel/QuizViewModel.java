@@ -1,11 +1,15 @@
 package com.madfree.capstoneproject.viewmodel;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.madfree.capstoneproject.data.Trivia;
 import com.madfree.capstoneproject.data.FirebaseQueryLiveData;
+import com.madfree.capstoneproject.data.User;
+import com.madfree.capstoneproject.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +33,18 @@ public class QuizViewModel extends ViewModel {
     private int triviaNumber;
     private String selectedCategory;
     private String selectedDifficulty;
+    private String mUid;
+    private String mUserName;
 
     private FirebaseQueryLiveData getTriviaData() {
-        DatabaseReference TRIVIA_REF = FirebaseDatabase.getInstance().getReference().child("trivia");
+        DatabaseReference TRIVIA_REF = FirebaseDatabase.getInstance().getReference().child(
+                "trivia");
         Query categoryQuery = TRIVIA_REF.orderByChild("category").equalTo(selectedCategory);
         Timber.d("Query Firebase with category: %s", selectedCategory);
         return new FirebaseQueryLiveData(categoryQuery);
-    };
+    }
+
+    ;
 
     @NonNull
     public LiveData<List<Trivia>> getTriviaLiveData() {
@@ -44,12 +53,35 @@ public class QuizViewModel extends ViewModel {
         return mTriviaLiveData;
     }
 
+    public void setNewUserTotalScore() {
+        Constants.USER_REF.child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()) {
+                    //create new user
+                    User newUser = new User(mUserName, 1, mQuizScore);
+                    Constants.USER_REF.child(mUid).setValue(newUser);
+                    Timber.d("Creating new user");
+                } else {
+                    //TODO: if user exists, update node
+                    Timber.d("User already exists, updating score and games played");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //TODO: log error
+            }
+        });
+    }
+
     private class Deserializer implements Function<DataSnapshot, List<Trivia>> {
         @Override
         public List<Trivia> apply(DataSnapshot dataSnapshot) {
             if (mTriviaList == null) {
                 mTriviaList = new ArrayList<>();
-                Timber.d("Receiving data snapshot with this number of children: %s", dataSnapshot.getChildrenCount());
+                Timber.d("Receiving data snapshot with this number of children: %s",
+                        dataSnapshot.getChildrenCount());
                 Timber.d("Initializing the trivia list");
                 for (DataSnapshot triviaSnapshot : dataSnapshot.getChildren()) {
                     Trivia trivia = triviaSnapshot.getValue(Trivia.class);
@@ -76,7 +108,7 @@ public class QuizViewModel extends ViewModel {
     public MutableLiveData<Boolean> canIncrementCountLiveData() {
         triviaNumber = mTriviaCountLiveData.getValue();
         Timber.d("number from MutableLiveData is: %s", triviaNumber);
-        if (triviaNumber < mTriviaList.size()-1) {
+        if (triviaNumber < mTriviaList.size() - 1) {
             triviaNumber++;
             Timber.d("Increment number count to: %s", triviaNumber);
             mTriviaCountLiveData.setValue(triviaNumber);
@@ -106,13 +138,26 @@ public class QuizViewModel extends ViewModel {
         this.selectedDifficulty = selectedDifficulty;
     }
 
+    public String getSelectedCategory() {
+        return selectedCategory;
+    }
+
+    public String getSelectedDifficulty() {
+        return selectedDifficulty;
+    }
+
     public MutableLiveData<Integer> getmQuizScoreLiveData() {
         return mQuizScoreLiveData;
     }
 
     public void updatemQuizeScoreLiveData() {
-        mQuizScore+=10;
+        mQuizScore += 10;
         mQuizScoreLiveData.setValue(mQuizScore);
         Timber.d("Score in QuizViewModel is now: " + mQuizScore);
+    }
+
+    public void setmUser(String Uid, String name) {
+        this.mUid = Uid;
+        this.mUserName = name;
     }
 }

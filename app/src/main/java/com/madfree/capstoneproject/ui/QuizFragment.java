@@ -24,6 +24,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
@@ -193,6 +194,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private void finishQuiz() {
         // show result screen
         Toast.makeText(requireView().getContext(), "Quiz is finished", Toast.LENGTH_SHORT).show();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, new ResultFragment()).commit();
     }
 
     @Override
