@@ -4,16 +4,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.madfree.capstoneproject.R;
+import com.madfree.capstoneproject.data.User;
 import com.madfree.capstoneproject.viewmodel.QuizViewModel;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 public class ResultFragment extends Fragment {
@@ -42,8 +48,6 @@ public class ResultFragment extends Fragment {
                 Timber.d("ResultScreen: %s", category);
             }
         });
-
-        quizViewModel.setNewUserTotalScore();
 
         return view;
     }

@@ -8,7 +8,11 @@ public class Constants {
     // Auth
     public static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
+
+    //USER
     public static final DatabaseReference USER_REF = FirebaseDatabase.getInstance().getReference("users");
+    public static final String KEY_USER_HIGH_SCORE = "totalScore";
+    public static final String KEY_USER_GAMES_PLAYED = "gamesPlayed";
 
     // Trivia image
     public static final int RC_PHOTO_PICKER = 2;

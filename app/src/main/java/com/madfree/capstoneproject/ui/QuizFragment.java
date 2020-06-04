@@ -111,6 +111,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             startCountDown();
         }
 
+        quizViewModel.getUserInfo();
+
         quizViewModel.getCountLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
@@ -193,6 +195,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void finishQuiz() {
         // show result screen
+        quizViewModel.setNewHighScore();
         Toast.makeText(requireView().getContext(), "Quiz is finished", Toast.LENGTH_SHORT).show();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, new ResultFragment()).commit();

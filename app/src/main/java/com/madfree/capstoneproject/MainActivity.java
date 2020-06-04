@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.madfree.capstoneproject.data.User;
 import com.madfree.capstoneproject.ui.HomeFragment;
+import com.madfree.capstoneproject.ui.RankingFragment;
 import com.madfree.capstoneproject.ui.SubmitFragment;
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.viewmodel.QuizViewModel;
@@ -155,6 +156,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_submit:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new SubmitFragment()).commit();
+                break;
+            case R.id.nav_ranking:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new RankingFragment()).commit();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);

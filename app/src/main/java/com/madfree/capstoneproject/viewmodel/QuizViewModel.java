@@ -35,6 +35,8 @@ public class QuizViewModel extends ViewModel {
     private String selectedDifficulty;
     private String mUid;
     private String mUserName;
+    private int mTotalScore;
+    private int mGamesPlayed;
 
     private FirebaseQueryLiveData getTriviaData() {
         DatabaseReference TRIVIA_REF = FirebaseDatabase.getInstance().getReference().child(
@@ -44,8 +46,6 @@ public class QuizViewModel extends ViewModel {
         return new FirebaseQueryLiveData(categoryQuery);
     }
 
-    ;
-
     @NonNull
     public LiveData<List<Trivia>> getTriviaLiveData() {
         FirebaseQueryLiveData liveData = getTriviaData();
@@ -53,26 +53,35 @@ public class QuizViewModel extends ViewModel {
         return mTriviaLiveData;
     }
 
-    public void setNewUserTotalScore() {
+    public void getUserInfo() {
         Constants.USER_REF.child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()) {
+                if (!dataSnapshot.exists()) {
                     //create new user
-                    User newUser = new User(mUserName, 1, mQuizScore);
+                    User newUser = new User(mUserName, 0, 0);
                     Constants.USER_REF.child(mUid).setValue(newUser);
                     Timber.d("Creating new user");
                 } else {
-                    //TODO: if user exists, update node
-                    Timber.d("User already exists, updating score and games played");
+                    // if user exists, get the info
+                    Timber.d("User already exists, fetching current total score and games played");
+                    User userData = dataSnapshot.getValue(User.class);
+                    mTotalScore = userData.getTotalScore();
+                    mGamesPlayed = userData.getTotalScore();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 //TODO: log error
             }
         });
+    }
+
+    public void setNewHighScore() {
+        mTotalScore = mTotalScore + mQuizScore;
+        mGamesPlayed = mGamesPlayed+1;
+        Constants.USER_REF.child(mUid).child(Constants.KEY_USER_HIGH_SCORE).setValue(mQuizScore);
+        Constants.USER_REF.child(mUid).child(Constants.KEY_USER_GAMES_PLAYED).setValue(mGamesPlayed);
     }
 
     private class Deserializer implements Function<DataSnapshot, List<Trivia>> {
