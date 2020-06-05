@@ -155,14 +155,28 @@ public class QuizViewModel extends ViewModel {
         return selectedDifficulty;
     }
 
-    public MutableLiveData<Integer> getmQuizScoreLiveData() {
+    public MutableLiveData<Integer> getQuizScoreLiveData() {
         return mQuizScoreLiveData;
     }
 
-    public void updatemQuizeScoreLiveData() {
-        mQuizScore += 10;
-        mQuizScoreLiveData.setValue(mQuizScore);
-        Timber.d("Score in QuizViewModel is now: " + mQuizScore);
+    public void updateQuizScoreLiveData() {
+        switch (selectedDifficulty) {
+            case "Easy":
+                mQuizScore += Constants.KEY_POINTS_DIFFICULTY_EASY;
+                mQuizScoreLiveData.setValue(mQuizScore);
+                Timber.d("Add 10 points to score - now: %s", mQuizScore);
+                break;
+            case "Medium":
+                mQuizScore += Constants.KEY_POINTS_DIFFICULTY_MEDIUM;
+                mQuizScoreLiveData.setValue(mQuizScore);
+                Timber.d("Add 15 points to score - now: %s", mQuizScore);
+                break;
+            case "Hard":
+                mQuizScore += Constants.KEY_POINTS_DIFFICULTY_HARD;
+                mQuizScoreLiveData.setValue(mQuizScore);
+                Timber.d("Add 20 points to score - now: %s", mQuizScore);
+                break;
+        }
     }
 
     public void setmUser(String Uid, String name) {

@@ -214,7 +214,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             String answerText = selectedButton.getText().toString();
 
             if (answerText.equals(currentTrivia.getAnswer())) {
-                quizViewModel.updatemQuizeScoreLiveData();
+                quizViewModel.updateQuizScoreLiveData();
                 Timber.d("Updating score");
             }
         }
