@@ -19,8 +19,6 @@ import androidx.fragment.app.FragmentTransaction;
 public class HomeFragment extends Fragment {
 
     private Button playButton;
-    private String selectedCategory;
-    private String selectedDifficulty;
 
     @Nullable
     @Override
@@ -46,15 +44,16 @@ public class HomeFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //getActivity().getViewModelStore().clear();
                 Fragment quizFragment = new QuizFragment();
-                selectedCategory = categorySpinner.getSelectedItem().toString();
-                selectedDifficulty = difficultySpinner.getSelectedItem().toString();
+                String selectedCategory = categorySpinner.getSelectedItem().toString();
+                String selectedDifficulty = difficultySpinner.getSelectedItem().toString();
 
                 Bundle args = new Bundle();
                 args.putString(Constants.KEY_CATEGORY_STRING, selectedCategory);
                 args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
                 quizFragment.setArguments(args);
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, quizFragment);
                 transaction.commit();
             }

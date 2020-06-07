@@ -26,24 +26,22 @@ public class ResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Timber.d("QuizFragment onCreateView");
-
-        quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
-        Timber.d("Initialize QuizViewModel");
+        Timber.d("onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_result, container, false);
         mScoreTextView = view.findViewById(R.id.text_view_score);
 
+        quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
+        Timber.d("Initialize QuizViewModel");
+
+        //quizViewModel.setNewHighScore();
+
         quizViewModel.getQuizScoreLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                if (integer == 0) {
-                    mScoreTextView.setText(String.valueOf(0));
-                } else {
-                    mScoreTextView.setText(String.valueOf(integer));
-                    String category = quizViewModel.getSelectedCategory();
-                    Timber.d("ResultScreen: %s", category);
-                }
+                mScoreTextView.setText(String.valueOf(integer));
+                String category = quizViewModel.getSelectedCategory();
+                Timber.d("ResultScreen: %s", category);
             }
         });
         return view;

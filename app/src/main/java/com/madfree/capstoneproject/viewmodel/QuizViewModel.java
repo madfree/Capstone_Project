@@ -1,5 +1,9 @@
 package com.madfree.capstoneproject.viewmodel;
 
+import android.os.CountDownTimer;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,25 +29,48 @@ import timber.log.Timber;
 public class QuizViewModel extends ViewModel {
 
     private LiveData<List<Trivia>> mTriviaLiveData;
-    private MutableLiveData<Integer> mTriviaCountLiveData;
-    private MutableLiveData<Integer> mQuizScoreLiveData = new MutableLiveData<>();
-    private MutableLiveData<Boolean> mQuizIsFinished = new MutableLiveData<>();
-    private int mQuizScore;
     private List<Trivia> mTriviaList;
-    private int triviaNumber;
-    private String selectedCategory;
-    private String selectedDifficulty;
+
+    private CountDownTimer countDownTimer;
+
+    private MutableLiveData<Integer> counterLiveData;
+    private MutableLiveData<Integer> mTriviaDataListSize;
+
+    // TODO: Variables need to get initialized with new MutableLiveData()
+    private MutableLiveData<Integer> mQuizScoreLiveData;
+    private MutableLiveData<Boolean> mQuizIsFinished;
+    private MutableLiveData<Long> mTimeLeftinMilisLiveData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isQuizFinished;
+
     private String mUid;
     private String mUserName;
+    private String selectedCategory;
+    private String selectedDifficulty;
+
+    private int triviaNumber;
+    private int mQuizScore;
     private int mTotalScore;
     private int mGamesPlayed;
 
-    private FirebaseQueryLiveData getTriviaData() {
-        DatabaseReference TRIVIA_REF = FirebaseDatabase.getInstance().getReference().child(
-                "trivia");
-        Query categoryQuery = TRIVIA_REF.orderByChild("category").equalTo(selectedCategory);
-        Timber.d("Query Firebase with category: %s", selectedCategory);
-        return new FirebaseQueryLiveData(categoryQuery);
+    public QuizViewModel() {
+        // initialize variables with new MutableLiveData()
+        mQuizScoreLiveData = new MutableLiveData<>();
+        Timber.d("Reset score");
+        mQuizIsFinished = new MutableLiveData<>();
+        Timber.d("Reset counter");
+        isQuizFinished = new MutableLiveData<>();
+
+        startCountDownTimer();
+    }
+
+    // Initial calls to database
+    @NonNull
+    public MutableLiveData<Integer> getTriviaListSize() {
+        FirebaseQueryLiveData liveData = getTriviaData();
+        mTriviaLiveData = Transformations.map(liveData, new Deserializer());
+        mTriviaDataListSize = new MutableLiveData<>();
+        mTriviaDataListSize.setValue(mTriviaList.size());
+        return mTriviaDataListSize;
     }
 
     @NonNull
@@ -53,33 +80,59 @@ public class QuizViewModel extends ViewModel {
         return mTriviaLiveData;
     }
 
-    public void getUserInfo() {
-        Constants.USER_REF.child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
+    private FirebaseQueryLiveData getTriviaData() {
+        DatabaseReference TRIVIA_REF = FirebaseDatabase.getInstance().getReference().child(
+                "trivia");
+        Query categoryQuery = TRIVIA_REF.orderByChild("category").equalTo(selectedCategory);
+        Timber.d("Query Firebase with category: %s", selectedCategory);
+        return new FirebaseQueryLiveData(categoryQuery);
+    }
+
+    public void startCountDownTimer() {
+        countDownTimer = new CountDownTimer(Constants.COUNTDOWN_IN_MILLIS, 1000) {
+
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    //create new user
-                    User newUser = new User(mUserName, 0, 0);
-                    Constants.USER_REF.child(mUid).setValue(newUser);
-                    Timber.d("Creating new user");
-                } else {
-                    // if user exists, get the info
-                    Timber.d("User already exists, fetching current total score and games played");
-                    User userData = dataSnapshot.getValue(User.class);
-                    mTotalScore = userData.getTotalScore();
-                    mGamesPlayed = userData.getTotalScore();
-                }
+            public void onTick(long millisUntilFinished) {
+                mTimeLeftinMilisLiveData.setValue(millisUntilFinished);
+                Timber.d("CountDownTimer onTick(");
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                //TODO: log error
+            public void onFinish() {
+                mTimeLeftinMilisLiveData.setValue(0L);
+                Timber.d("CountDownTimer onFinish()");
+                incrementCountLiveData();
             }
-        });
+        }.start();
+    }
+
+    public void cancelCountDownTimer() {
+        countDownTimer.cancel();
+    }
+
+    public void setTimeLeftInMiLlisLiveData(long time) {
+        mTimeLeftinMilisLiveData.setValue(time);
+    }
+
+    public LiveData<Long> getTimeLeftInMillisLiveData() {
+        return mTimeLeftinMilisLiveData;
+    }
+
+    public MutableLiveData<Long> finishCountdown() {
+        mTimeLeftinMilisLiveData.setValue(null);
+        countDownTimer.onFinish();
+        return mTimeLeftinMilisLiveData;
+    }
+
+    public MutableLiveData<Long> cancelCountDown() {
+        Timber.d("Cancel CountDownTimer");
+        countDownTimer.cancel();
+        return mTimeLeftinMilisLiveData;
     }
 
     public void setNewHighScore() {
         mTotalScore = mTotalScore + mQuizScore;
-        mGamesPlayed = mGamesPlayed+1;
+        mGamesPlayed = mGamesPlayed + 1;
         Constants.USER_REF.child(mUid).child(Constants.KEY_USER_HIGH_SCORE).setValue(mQuizScore);
         Constants.USER_REF.child(mUid).child(Constants.KEY_USER_GAMES_PLAYED).setValue(mGamesPlayed);
     }
@@ -106,36 +159,59 @@ public class QuizViewModel extends ViewModel {
         }
     }
 
-    public LiveData<Integer> getCountLiveData() {
-        Timber.d("Getting the current trivia number");
-        if (mTriviaCountLiveData == null) {
-            mTriviaCountLiveData = new MutableLiveData<>(0);
-        }
-        return mTriviaCountLiveData;
-    }
-
     public MutableLiveData<Boolean> canIncrementCountLiveData() {
-        triviaNumber = mTriviaCountLiveData.getValue();
-        Timber.d("number from MutableLiveData is: %s", triviaNumber);
-        if (triviaNumber < mTriviaList.size() - 1) {
-            triviaNumber++;
-            Timber.d("Increment number count to: %s", triviaNumber);
-            mTriviaCountLiveData.setValue(triviaNumber);
-            Timber.d("MutableLiveData is now: %s", mTriviaCountLiveData.getValue());
+        int triviaNumber = counterLiveData.getValue() - 1;
+        if (triviaNumber <= mTriviaList.size()) {
+            Timber.d("To the next trivia: %s", triviaNumber);
             mQuizIsFinished.setValue(false);
         } else {
+            Timber.d("Quiz is finished");
             mQuizIsFinished.setValue(true);
         }
         return mQuizIsFinished;
     }
 
-    public MutableLiveData<Integer> getmTriviaCountLiveData() {
-        return mTriviaCountLiveData;
+    public MutableLiveData<Integer> incrementCountLiveData() {
+        int number = counterLiveData.getValue();
+        Timber.d("counter from MutableLiveData is: " + number);
+        number++;
+        Timber.d("Increment counter to: %s", number);
+        counterLiveData.setValue(number);
+        return counterLiveData;
     }
 
-    public Trivia getCurrentTrivia() {
-        return mTriviaList.get(triviaNumber);
+    public MutableLiveData<Integer> getCounterLiveData() {
+        Timber.d("Get number for the counter");
+        if (counterLiveData == null) {
+            counterLiveData = new MutableLiveData<>();
+            counterLiveData.setValue(0);
+        }
+        return counterLiveData;
     }
+
+    public MutableLiveData<Boolean> getmQuizIsFinished() {
+        if (isQuizFinished == null) {
+            isQuizFinished = new MutableLiveData<>();
+        }
+        int number = counterLiveData.getValue();
+        if (number < mTriviaList.size()) {
+            Timber.d("MutableLiveData is now: " + counterLiveData.getValue());
+            isQuizFinished.setValue(false);
+        } else {
+            isQuizFinished.setValue(true);
+        }
+        return isQuizFinished;
+    }
+
+    public MutableLiveData<Trivia> getCurrentTrivia() {
+        MutableLiveData<Trivia> triviaLiveData = new MutableLiveData<>();
+        int number = counterLiveData.getValue() - 1;
+
+        Trivia trivia = mTriviaLiveData.getValue().get(number);
+        triviaLiveData.setValue(trivia);
+        return triviaLiveData;
+    }
+
 
     public void setSelectedCategory(String selectedCategory) {
         Timber.d("Category delivered to ViewModel: %s", selectedCategory);
@@ -155,11 +231,20 @@ public class QuizViewModel extends ViewModel {
         return selectedDifficulty;
     }
 
+    // methods to deal with quiz score
     public MutableLiveData<Integer> getQuizScoreLiveData() {
+        if (mQuizScoreLiveData == null) {
+            mQuizScoreLiveData = new MutableLiveData<>();
+            mQuizScoreLiveData.setValue(0);
+            Timber.d("Init quiz score with 0");
+        }
         return mQuizScoreLiveData;
     }
 
     public void updateQuizScoreLiveData() {
+        if (mQuizScoreLiveData == null) {
+            mQuizScoreLiveData = new MutableLiveData<>();
+        }
         switch (selectedDifficulty) {
             case "Easy":
                 mQuizScore += Constants.KEY_POINTS_DIFFICULTY_EASY;
@@ -179,8 +264,37 @@ public class QuizViewModel extends ViewModel {
         }
     }
 
-    public void setmUser(String Uid, String name) {
-        this.mUid = Uid;
-        this.mUserName = name;
+    // fetch user info from Firebase Auth
+    public void getUserInfo() {
+        mUid = FirebaseAuth.getInstance().getUid();
+        Constants.USER_REF.child(mUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    //create new user
+                    User newUser = new User(mUserName, 0, 0);
+                    Constants.USER_REF.child(mUid).setValue(newUser);
+                    Timber.d("Creating new user");
+                } else {
+                    // if user exists, get the info
+                    Timber.d("User already exists, fetching current total score and games played");
+                    User userData = dataSnapshot.getValue(User.class);
+                    mTotalScore = userData.getTotalScore();
+                    mGamesPlayed = userData.getTotalScore();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //TODO: log error
+                Timber.d("Firebase Database error: %s", databaseError);
+            }
+        });
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        countDownTimer.cancel();
     }
 }

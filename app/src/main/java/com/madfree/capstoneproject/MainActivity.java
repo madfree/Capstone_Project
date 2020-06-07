@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
 
 import android.content.Intent;
@@ -25,12 +24,10 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.madfree.capstoneproject.data.User;
 import com.madfree.capstoneproject.ui.HomeFragment;
 import com.madfree.capstoneproject.ui.RankingFragment;
 import com.madfree.capstoneproject.ui.SubmitFragment;
 import com.madfree.capstoneproject.util.Constants;
-import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 
 import java.util.Arrays;
 
@@ -39,8 +36,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String mUserName;
     private String mUserEmail;
     private Uri mUserImageUrl;
-
-    private QuizViewModel quizViewModel;
 
     // Firebase Instance Variables
     private FirebaseAuth mFirebaseAuth;
@@ -98,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mUserNameTextView.setText(mUserName);
                     mUserEmail = user.getEmail();
                     mUserEmailTextView.setText(mUserEmail);
-                    quizViewModel.setmUser(user.getUid(), mUserName);
                 } else {
                     // user is not signed in
                     mUserName = Constants.ANONYMOUS;
@@ -114,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         };
-        quizViewModel = new ViewModelProvider(this).get(QuizViewModel.class);
     }
 
     @Override

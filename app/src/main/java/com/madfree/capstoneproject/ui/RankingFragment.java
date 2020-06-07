@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.User;
-import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 import com.madfree.capstoneproject.viewmodel.RankingViewModel;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +46,6 @@ public class RankingFragment extends Fragment {
                 layoutManager = new LinearLayoutManager(requireActivity());
                 mRecyclerView.setLayoutManager(layoutManager);
                 mAdapter = new RankAdapter(users);
-                //mAdapter.notifyDataSetChanged();
                 mRecyclerView.setAdapter(mAdapter);
             }
         });
