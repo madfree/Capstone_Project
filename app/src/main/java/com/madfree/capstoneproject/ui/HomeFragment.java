@@ -44,7 +44,7 @@ public class HomeFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //getActivity().getViewModelStore().clear();
+                getActivity().getViewModelStore().clear();
                 Fragment quizFragment = new QuizFragment();
                 String selectedCategory = categorySpinner.getSelectedItem().toString();
                 String selectedDifficulty = difficultySpinner.getSelectedItem().toString();

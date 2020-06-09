@@ -1,18 +1,23 @@
 package com.madfree.capstoneproject.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.madfree.capstoneproject.util.Constants;
-import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.Trivia;
+import com.madfree.capstoneproject.viewmodel.QuizViewModel;
+import com.madfree.capstoneproject.viewmodel.QuizViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,10 +34,13 @@ import timber.log.Timber;
 
 public class QuizFragment extends Fragment implements View.OnClickListener {
 
+    private ProgressBar progressBar;
     private ImageView question_image_view;
 
     private TextView questions_count_text_view;
+    private TextView separator_text_view;
     private TextView questions_count_text_view_total;
+    private ImageView clock_image_view;
     private TextView countdown_timer_text_view;
     private TextView question_text_view;
     private Button question_answer_1;
@@ -41,9 +49,16 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private Button question_answer_4;
 
     private QuizViewModel quizViewModel;
-    private Trivia currentTrivia;
 
-    private int mTriviaNumber;
+    private List<Trivia> mTriviaList;
+    private Trivia currentTrivia;
+    private boolean isQuizFinished;
+
+    private int mTriviaCount;
+    private int mTriviaTotalCount;
+
+    private CountDownTimer countDownTimer;
+    private long mTimeLeft;
 
     private String selectedCategory;
     private String selectedDifficulty;
@@ -61,19 +76,23 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         Timber.d("QuizFragment onCreateView");
 //        requireActivity().getActionBar().hide();
 
-        quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
-        Timber.d("Initialize QuizViewModel");
         selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
-        quizViewModel.setSelectedCategory(selectedCategory);
         Timber.d("This is the category: %s", selectedCategory);
         selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
-        quizViewModel.setSelectedDifficulty(selectedDifficulty);
         Timber.d("This is the category: %s", selectedDifficulty);
+
+        quizViewModel = new ViewModelProvider(requireActivity(), new QuizViewModelFactory(selectedCategory, selectedDifficulty)).get(QuizViewModel.class);
 
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
+        progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         questions_count_text_view = view.findViewById(R.id.text_view_question_count);
+        separator_text_view = view.findViewById(R.id.text_view_separator);
         questions_count_text_view_total = view.findViewById(R.id.text_view_question_count_total);
+
+        clock_image_view = view.findViewById(R.id.icon_clock);
         countdown_timer_text_view = view.findViewById(R.id.text_view_timer_countdown);
 
         question_text_view = view.findViewById(R.id.text_view_question);
@@ -89,12 +108,22 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_3.setOnClickListener(this);
         question_answer_4.setOnClickListener(this);
 
-        quizViewModel.getCounterLiveData().observe(this, new Observer<Integer>() {
+        disableUI();
+
+        quizViewModel.getTriviaNumber().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-                String numberString = String.valueOf(integer+1);
-                mTriviaNumber = integer;
-                questions_count_text_view.setText(numberString);
+                if (integer == -1) {
+                    Timber.d("Quiz finished: %s", integer);
+                    quizViewModel.cancelCountDown();
+                    showResult();
+                } else {
+                    isQuizFinished = false;
+                    Timber.d("Receiving the new trivia number from ViewModel: %s", integer);
+                    mTriviaCount = integer;
+                    questions_count_text_view.setText(String.valueOf(mTriviaCount));
+                    showNextTrivia();
+                }
             }
         });
 
@@ -109,36 +138,96 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                         }
                     }
                 });
-
-
-        quizViewModel.getTriviaLiveData().observe(this, new Observer<List<Trivia>>() {
-            @Override
-            public void onChanged(List<Trivia> trivias) {
-                Timber.d("Updating trivia data from ViewModel");
-                String listSize = String.valueOf(trivias.size());
-                questions_count_text_view_total.setText(listSize);
-
-                currentTrivia = trivias.get(mTriviaNumber);
-
-                List<String> answerList = new ArrayList<>();
-                answerList.add(currentTrivia.getAnswer());
-                answerList.add(currentTrivia.getWrong_answer_1());
-                answerList.add(currentTrivia.getWrong_answer_2());
-                answerList.add(currentTrivia.getWrong_answer_3());
-                Collections.shuffle(answerList);
-
-                question_image_view.setVisibility(View.GONE);
-                question_text_view.setText(currentTrivia.getQuestion());
-                question_answer_1.setText(answerList.get(0));
-                question_answer_2.setText(answerList.get(1));
-                question_answer_3.setText(answerList.get(2));
-                question_answer_4.setText(answerList.get(3));
-            }
-        });
-
-//        quizViewModel.getUserInfo();
-
         return view;
+    }
+
+    private void showNextTrivia() {
+        currentTrivia = quizViewModel.getCurrentTrivia();
+        List<String> answerList = new ArrayList<>();
+        answerList.add(currentTrivia.getAnswer());
+        answerList.add(currentTrivia.getWrong_answer_1());
+        answerList.add(currentTrivia.getWrong_answer_2());
+        answerList.add(currentTrivia.getWrong_answer_3());
+        Collections.shuffle(answerList);
+
+        question_image_view.setVisibility(View.GONE);
+        question_text_view.setText(currentTrivia.getQuestion());
+        question_answer_1.setText(answerList.get(0));
+        question_answer_2.setText(answerList.get(1));
+        question_answer_3.setText(answerList.get(2));
+        question_answer_4.setText(answerList.get(3));
+        showTriviaUI();
+    }
+
+    @Override
+    public void onClick(View view) {
+        checkAnswer(view);
+    }
+
+    private void checkAnswer(View view) {
+        if (view != null) {
+            Button selectedButton = (Button) view;
+            String answerText = selectedButton.getText().toString();
+            if (answerText.equals(currentTrivia.getAnswer())) {
+                quizViewModel.updateQuizScoreLiveData();
+                Timber.d("Updating score");
+                selectedButton.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            } else {
+                selectedButton.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            }
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    Timber.d("isQuizFinished is: %s", isQuizFinished);
+                        resetButtonColor();
+                        quizViewModel.incrementTriviaCount();
+                }
+            }, 500);   //1 second
+        }
+    }
+
+    public void resetButtonColor() {
+        question_answer_1.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        question_answer_2.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        question_answer_3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        question_answer_4.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+    }
+
+    private void showTriviaUI() {
+        int listSize = quizViewModel.getTriviaDataListSize();
+        questions_count_text_view_total.setText(String.valueOf(listSize));
+        questions_count_text_view.setVisibility(View.VISIBLE);
+        separator_text_view.setVisibility(View.VISIBLE);
+        questions_count_text_view_total.setVisibility(View.VISIBLE);
+
+        clock_image_view.setVisibility(View.VISIBLE);
+        countdown_timer_text_view.setVisibility(View.VISIBLE);
+
+        question_text_view.setVisibility(View.VISIBLE);
+        question_image_view.setVisibility(View.VISIBLE);
+
+        question_answer_1.setVisibility(View.VISIBLE);
+        question_answer_2.setVisibility(View.VISIBLE);
+        question_answer_3.setVisibility(View.VISIBLE);
+        question_answer_4.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    private void disableUI() {
+        questions_count_text_view.setVisibility(View.INVISIBLE);
+        separator_text_view.setVisibility(View.INVISIBLE);
+        questions_count_text_view_total.setVisibility(View.INVISIBLE);
+
+        clock_image_view.setVisibility(View.INVISIBLE);
+        countdown_timer_text_view.setVisibility(View.INVISIBLE);
+
+        question_text_view.setVisibility(View.INVISIBLE);
+        question_image_view.setVisibility(View.INVISIBLE);
+
+        question_answer_1.setVisibility(View.INVISIBLE);
+        question_answer_2.setVisibility(View.INVISIBLE);
+        question_answer_3.setVisibility(View.INVISIBLE);
+        question_answer_4.setVisibility(View.INVISIBLE);
     }
 
     private void updateCountDownText(long timeLeftInMillis) {
@@ -153,32 +242,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         } else {
             countdown_timer_text_view.setTextColor(Color.BLACK);
         }
-    }
-
-    @Override
-    public void onClick(View view) {
-        quizViewModel.cancelCountDown();
-        checkAnswer(view);
-    }
-
-    private void checkAnswer(View view) {
-        if (view != null) {
-            Button selectedButton = (Button) view;
-            String answerText = selectedButton.getText().toString();
-            if (answerText.equals(currentTrivia.getAnswer())) {
-                quizViewModel.updateQuizScoreLiveData();
-                Timber.d("Updating score");
-            }
-        }
-        quizViewModel.incrementCountLiveData();
-        quizViewModel.getmQuizIsFinished().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean quizFinished) {
-                if (quizFinished) {
-                    showResult();
-                }
-            }
-        });
     }
 
     private void showResult() {

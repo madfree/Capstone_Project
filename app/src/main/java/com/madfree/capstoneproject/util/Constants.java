@@ -32,7 +32,7 @@ public class Constants {
     public static final int DEFAULT_ANSWER_LENGTH = 30;
 
     // Quiz
-    public static final long COUNTDOWN_IN_MILLIS = 10000;
+    public static final long COUNTDOWN_IN_MILLIS = 60000;
     public static final int  QUIZ_MAX_SIZE = 10;
     public static final String KEY_MILLIS_LEFT = "key_millis_left";
     public static final int KEY_POINTS_DIFFICULTY_EASY = 10;

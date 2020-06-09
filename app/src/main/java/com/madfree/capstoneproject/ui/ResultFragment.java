@@ -40,8 +40,6 @@ public class ResultFragment extends Fragment {
             @Override
             public void onChanged(Integer integer) {
                 mScoreTextView.setText(String.valueOf(integer));
-                String category = quizViewModel.getSelectedCategory();
-                Timber.d("ResultScreen: %s", category);
             }
         });
         return view;
