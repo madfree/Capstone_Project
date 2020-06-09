@@ -1,6 +1,5 @@
 package com.madfree.capstoneproject.ui;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -12,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.R;
@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -74,7 +75,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Timber.d("QuizFragment onCreateView");
-//        requireActivity().getActionBar().hide();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
         Timber.d("This is the category: %s", selectedCategory);
