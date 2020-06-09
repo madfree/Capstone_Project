@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import timber.log.Timber;
 
 import android.content.Intent;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String mUserName;
     private String mUserEmail;
     private Uri mUserImageUrl;
+    private long backPressedTime;
 
     // Firebase Instance Variables
     private FirebaseAuth mFirebaseAuth;
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mUserImageView = navHeaderLayout.findViewById(R.id.user_image_view);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-               R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -98,12 +102,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mUserName = Constants.ANONYMOUS;
                     startActivityForResult(
                             AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setIsSmartLockEnabled(true)
-                            .setAvailableProviders(Arrays.asList(
-                                    new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                    new AuthUI.IdpConfig.EmailBuilder().build()))
-                            .build(),
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(true)
+                                    .setAvailableProviders(Arrays.asList(
+                                            new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                            new AuthUI.IdpConfig.EmailBuilder().build()))
+                                    .build(),
                             Constants.RC_SIGN_IN);
                 }
             }
@@ -167,4 +171,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
+
 }

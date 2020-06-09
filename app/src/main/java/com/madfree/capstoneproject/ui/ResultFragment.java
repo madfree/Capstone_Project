@@ -53,7 +53,7 @@ public class ResultFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment homeFragment = new HomeFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, homeFragment);
                 transaction.commit();
             }

@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.madfree.capstoneproject.MainActivity;
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.Trivia;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +62,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private CountDownTimer countDownTimer;
     private long mTimeLeft;
+    private long backPressedTime;
+    private boolean exitQuiz = false;
 
     private String selectedCategory;
     private String selectedDifficulty;
@@ -68,6 +72,26 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("QuizFragment onCreate");
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+
+                if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                    getViewModelStore().clear();
+                    Fragment homeFragment = new HomeFragment();
+                    FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container, homeFragment);
+                    transaction.commit();
+                    Timber.d("Exit quiz");
+                } else {
+                    Toast.makeText(getContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();
+                }
+                backPressedTime = System.currentTimeMillis();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Nullable
@@ -75,14 +99,15 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Timber.d("QuizFragment onCreateView");
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
         Timber.d("This is the category: %s", selectedCategory);
         selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
         Timber.d("This is the category: %s", selectedDifficulty);
 
-        quizViewModel = new ViewModelProvider(requireActivity(), new QuizViewModelFactory(selectedCategory, selectedDifficulty)).get(QuizViewModel.class);
+        quizViewModel = new ViewModelProvider(requireActivity(),
+                new QuizViewModelFactory(selectedCategory, selectedDifficulty)).get(QuizViewModel.class);
 
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
@@ -108,6 +133,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_2.setOnClickListener(this);
         question_answer_3.setOnClickListener(this);
         question_answer_4.setOnClickListener(this);
+
+
 
         disableUI();
 
@@ -180,8 +207,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             handler.postDelayed(new Runnable() {
                 public void run() {
                     Timber.d("isQuizFinished is: %s", isQuizFinished);
-                        resetButtonColor();
-                        quizViewModel.incrementTriviaCount();
+                    resetButtonColor();
+                    quizViewModel.incrementTriviaCount();
                 }
             }, 500);   //1 second
         }

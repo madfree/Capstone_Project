@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().getViewModelStore().clear();
+                requireActivity().getViewModelStore().clear();
                 Fragment quizFragment = new QuizFragment();
                 String selectedCategory = categorySpinner.getSelectedItem().toString();
                 String selectedDifficulty = difficultySpinner.getSelectedItem().toString();
@@ -55,9 +55,10 @@ public class HomeFragment extends Fragment {
                 args.putString(Constants.KEY_CATEGORY_STRING, selectedCategory);
                 args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
                 quizFragment.setArguments(args);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, quizFragment);
-                transaction.commit();
+                transaction.addToBackStack(null).commit();
             }
         });
 
