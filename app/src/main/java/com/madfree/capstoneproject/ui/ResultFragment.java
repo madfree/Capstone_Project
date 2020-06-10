@@ -10,12 +10,12 @@ import android.widget.TextView;
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import timber.log.Timber;
 
@@ -25,6 +25,21 @@ public class ResultFragment extends Fragment {
     private Button mHomeButton;
 
     private QuizViewModel quizViewModel;
+    private int mQuizScore;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("ResultFragment onCreate");
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button event
+                returnHome();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
 
     @Nullable
     @Override
@@ -38,27 +53,26 @@ public class ResultFragment extends Fragment {
         mHomeButton = view.findViewById(R.id.button_home);
 
         quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
-        Timber.d("Initialize QuizViewModel");
 
-        //quizViewModel.setNewHighScore();
-
-        quizViewModel.getQuizScoreLiveData().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                mScoreTextView.setText(String.valueOf(integer));
-            }
-        });
+        quizViewModel.setHighScore();
+        mQuizScore = quizViewModel.getQuizScore();
+        mScoreTextView.setText(String.valueOf(mQuizScore));
 
         mHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Fragment homeFragment = new HomeFragment();
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, homeFragment);
-                transaction.commit();
+                returnHome();
             }
         });
 
         return view;
+    }
+
+    private void returnHome() {
+        requireActivity().getViewModelStore().clear();
+        Fragment homeFragment = new HomeFragment();
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, homeFragment);
+        transaction.commit();
     }
 }

@@ -2,7 +2,6 @@ package com.madfree.capstoneproject.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.madfree.capstoneproject.MainActivity;
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.Trivia;
@@ -52,27 +50,16 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private Button question_answer_4;
 
     private QuizViewModel quizViewModel;
-
-    private List<Trivia> mTriviaList;
     private Trivia currentTrivia;
+
     private boolean isQuizFinished;
-
     private int mTriviaCount;
-    private int mTriviaTotalCount;
-
-    private CountDownTimer countDownTimer;
-    private long mTimeLeft;
     private long backPressedTime;
-    private boolean exitQuiz = false;
-
-    private String selectedCategory;
-    private String selectedDifficulty;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("QuizFragment onCreate");
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -101,9 +88,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         Timber.d("QuizFragment onCreateView");
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-        selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
+        String selectedCategory = getArguments().getString(Constants.KEY_CATEGORY_STRING);
         Timber.d("This is the category: %s", selectedCategory);
-        selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
+        String selectedDifficulty = getArguments().getString(Constants.KEY_DIFFICULTY_STRING);
         Timber.d("This is the category: %s", selectedDifficulty);
 
         quizViewModel = new ViewModelProvider(requireActivity(),
@@ -133,8 +120,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_2.setOnClickListener(this);
         question_answer_3.setOnClickListener(this);
         question_answer_4.setOnClickListener(this);
-
-
 
         disableUI();
 
@@ -166,6 +151,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                         }
                     }
                 });
+
         return view;
     }
 
