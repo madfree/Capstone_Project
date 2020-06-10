@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.User;
@@ -23,6 +24,7 @@ import timber.log.Timber;
 
 public class RankingFragment extends Fragment {
 
+    private ProgressBar progressBar;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -36,11 +38,13 @@ public class RankingFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
 
         View view = inflater.inflate(R.layout.fragment_ranking, container, false);
+        progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        mRecyclerView = view.findViewById(R.id.recycler_view);
 
         rankingViewModel = new ViewModelProvider(requireActivity()).get(RankingViewModel.class);
         Timber.d("Initialize QuizViewModel");
-
-        mRecyclerView = view.findViewById(R.id.recycler_view);
 
         rankingViewModel.getUserRankLiveData().observe(this, new Observer<List<User>>() {
             @Override
@@ -49,6 +53,7 @@ public class RankingFragment extends Fragment {
                 mRecyclerView.setLayoutManager(layoutManager);
                 mAdapter = new RankAdapter(users);
                 mRecyclerView.setAdapter(mAdapter);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
