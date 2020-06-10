@@ -7,9 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import timber.log.Timber;
 
 import android.content.Intent;
@@ -39,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String mUserName;
     private String mUserEmail;
     private Uri mUserImageUrl;
-    private long backPressedTime;
 
     // Firebase Instance Variables
     private FirebaseAuth mFirebaseAuth;
@@ -152,11 +148,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_submit:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new SubmitFragment()).commit();
+                        .replace(R.id.fragment_container, new SubmitFragment()).addToBackStack(null).commit();
                 break;
             case R.id.nav_ranking:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new RankingFragment()).commit();
+                        .replace(R.id.fragment_container, new RankingFragment()).addToBackStack(null).commit();
+                break;
+            case R.id.nav_logout:
+                AuthUI.getInstance().signOut(this);
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
