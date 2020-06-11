@@ -79,7 +79,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
     }
 
     @Override
-    public void QuizListDataAdded(DataSnapshot dataSnapshot) {
+    public void QuizDataAdded(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
             mTriviaList = new ArrayList<>();
             Timber.d("Receiving data snapshot with this number of children: %s",

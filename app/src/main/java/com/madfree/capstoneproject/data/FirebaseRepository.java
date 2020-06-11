@@ -31,7 +31,7 @@ public class FirebaseRepository {
         categoryQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                onFirebaseTaskComplete.QuizListDataAdded(dataSnapshot);
+                onFirebaseTaskComplete.QuizDataAdded(dataSnapshot);
             }
 
             @Override
@@ -42,11 +42,23 @@ public class FirebaseRepository {
     }
 
     public void getUserData() {
+        userReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                onFirebaseTaskComplete.QuizDataAdded(dataSnapshot);
+                Timber.d("Returning player data from Firebase");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Timber.e("Firebase loading problem: %s", databaseError);
+            }
+        });
 
     }
 
     public interface OnFirebaseTaskComplete {
-        void QuizListDataAdded(DataSnapshot dataSnapshot);
+        void QuizDataAdded(DataSnapshot dataSnapshot);
     }
 
 }
