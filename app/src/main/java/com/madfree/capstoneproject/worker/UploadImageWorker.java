@@ -34,7 +34,7 @@ public class UploadImageWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        mFirebaseStorage = mFirebaseStorage.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
         mTriviaImageStorageReference = mFirebaseStorage.getReference().child("trivia_images");
 
         CountDownLatch countDown = new CountDownLatch(2);

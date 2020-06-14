@@ -12,12 +12,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.Trivia;
 import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 import com.madfree.capstoneproject.viewmodel.QuizViewModelFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -164,7 +167,27 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         answerList.add(currentTrivia.getWrong_answer_3());
         Collections.shuffle(answerList);
 
-        question_image_view.setVisibility(View.GONE);
+//        if (quizViewModel.getCurrentTriviaImage() == null) {
+//            question_image_view.setVisibility(View.GONE);
+//        } else {
+//            question_image_view.setVisibility(View.VISIBLE);
+//            String filePath = quizViewModel.getCurrentTriviaImage();
+//            Timber.d("Trivia image path is %s", filePath);
+//            Glide.with(this)
+//                    .load(filePath)
+//                    .into(question_image_view);
+//        }
+
+        if (currentTrivia.getImage_url() != null) {
+            Glide.with(this)
+                    .load(currentTrivia.getImage_url())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(question_image_view);
+            question_image_view.setVisibility(View.VISIBLE);
+        } else {
+            question_image_view.setVisibility(View.INVISIBLE);
+        }
+
         question_text_view.setText(currentTrivia.getQuestion());
         question_answer_1.setText(answerList.get(0));
         question_answer_2.setText(answerList.get(1));

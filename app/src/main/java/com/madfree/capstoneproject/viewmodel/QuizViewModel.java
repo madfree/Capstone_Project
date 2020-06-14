@@ -11,9 +11,11 @@ import com.madfree.capstoneproject.data.Trivia;
 import com.madfree.capstoneproject.data.User;
 import com.madfree.capstoneproject.util.Constants;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -34,6 +36,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
 
     private int mCurrentTriviaNumber = 0;
     private int mTriviaDataListSize;
+    private List<File> imageFiles;
 
     // TODO: Variables need to get initialized with new MutableLiveData()
     private MutableLiveData<Integer> mTriviaCounter = new MutableLiveData<>();
@@ -82,6 +85,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
     public void QuizDataAdded(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
             mTriviaList = new ArrayList<>();
+//            imageFiles = new ArrayList<>();
             Timber.d("Receiving data snapshot with this number of children: %s",
                     dataSnapshot.getChildrenCount());
             Timber.d("Initializing the trivia list");
@@ -89,6 +93,11 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
                 Trivia trivia = triviaSnapshot.getValue(Trivia.class);
                 if (trivia.getDifficulty().equals(selectedDifficulty)) {
                     mTriviaList.add(trivia);
+//                    if (trivia.getImage_url() != null) {
+//                        File triviaImageFile = mFirebaseRepository.getImageData(trivia.getImage_url());
+//                        imageFiles.add(triviaImageFile);
+//                    }
+
                     Timber.d("This is the question: %s", trivia.getQuestion());
                     Timber.d("This is the number of trivia: %s", mTriviaList.size());
                 }
@@ -131,6 +140,12 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
         Trivia trivia = mTriviaList.get(mCurrentTriviaNumber-1);
         Timber.d("Getting the current trivia with question: %s", trivia.getQuestion());
         return trivia;
+    }
+
+    public String getCurrentTriviaImage() {
+        String imageFilePath = imageFiles.get(mCurrentTriviaNumber-1).getPath();
+        Timber.d("Returning image from QuizViewmodel with path%s", imageFilePath);
+        return imageFilePath;
     }
 
     public void updateQuizScoreLiveData() {
