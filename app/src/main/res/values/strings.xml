@@ -23,8 +23,14 @@
     <string name="appwidget_text">Top 10</string>
     <string name="add_widget">Add widget</string>
     <string name="widget_empty_string">No data to display. Please sign in!</string>
-    <string name="score">score</string>
-    <string name="player">player</string>
+    <string name="score">Score</string>
+    <string name="player">Player</string>
     <string name="widget_rank">#</string>
+    <string name="welcome_play_text">Select a category and a difficulty or play a random game.</string>
+    <string name="button_play_text">Play</string>
+    <string name="ranking_title">RANKING</string>
+    <string name="rank">Rank</string>
+    <string name="games">Games</string>
+    <string name="play_again_text">Play Again</string>
 
 </resources>

@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="RANKING"
+            android:text="@string/ranking_title"
             android:textAlignment="center"
             android:textSize="32sp"
             android:textStyle="bold"
@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Rank"
+                android:text="@string/rank"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Player"
+                android:text="@string/player"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -53,7 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Score"
+                android:text="@string/score"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -61,7 +61,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Games"
+                android:text="@string/games"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
