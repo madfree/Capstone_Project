@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +27,6 @@ public class WidgetDataProvider implements RemoteViewsFactory {
 
     private Context context;
     private Intent intent;
-    private int mAppWidgetId;
 
     private FirebaseDatabase db;
     private FirebaseAuth mFirebaseAuth;
@@ -38,8 +38,6 @@ public class WidgetDataProvider implements RemoteViewsFactory {
     public WidgetDataProvider(Context context, Intent intent) {
         this.context = context;
         this.intent = intent;
-//        this.mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-//                AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     public void fetchData() {
@@ -100,23 +98,27 @@ public class WidgetDataProvider implements RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
         Timber.d("Widget: Setting up the views in the list");
-        Timber.d("Set user at position " + mUserList.get(position));
+        Timber.d("Set user at position %s", position);
         User user = mUserList.get(position);
-        CharSequence rank = String.valueOf(position+1);
+
         CharSequence name = user.getUserName();
-        CharSequence score = String.valueOf(user.getTotalScore());
-        CharSequence gamesPlayed = String.valueOf(user.getGamesPlayed());
+        CharSequence score = (CharSequence) String.valueOf(user.getTotalScore());
+        CharSequence gamesPlayed = (CharSequence) String.valueOf(user.getGamesPlayed());
+        CharSequence rank = (CharSequence) String.valueOf(position + 1);
+
+        Timber.d("position: %s", rank);
+        Timber.d("name: %s", name);
+        Timber.d("score: %s", score);
+        Timber.d("games played: %s", gamesPlayed);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(rank).append("\t");
+        stringBuilder.append(name).append("\t\t");
+        stringBuilder.append(score).append("\t");
 
         RemoteViews view = new RemoteViews(context.getPackageName(), R.layout.widget_item);
-        view.setTextViewText(R.id.widget_player_rank_text_view, rank);
-        Timber.d("position: " + rank);
+        view.setTextViewText(R.id.widget_player_info_text_view, stringBuilder);
 
-        view.setTextViewText(R.id.widget_player_name_text_view, name);
-        Timber.d("name: %s", name);
-        view.setTextViewText(R.id.score_text_view, score);
-        Timber.d("score: %s", score);
-        view.setTextViewText(R.id.games_played_text_view, gamesPlayed);
-        Timber.d("games played: %s", gamesPlayed);
         return view;
     }
 

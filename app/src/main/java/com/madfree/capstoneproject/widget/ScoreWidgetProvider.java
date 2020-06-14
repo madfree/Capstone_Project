@@ -3,7 +3,6 @@ package com.madfree.capstoneproject.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,11 +26,11 @@ public class ScoreWidgetProvider extends AppWidgetProvider {
         Intent serviceIntent = new Intent(context, WidgetService.class);
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        //CharSequence widgetText = context.getString(R.string.appwidget_text);
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
         setRemoteAdapter(context, views);
+        views.setEmptyView(R.id.widget_list, R.id.empty_view);
 
         /** PendingIntent to launch the MainActivity when the widget was clicked **/
         Intent launchMain = new Intent(context, MainActivity.class);
@@ -40,10 +39,8 @@ public class ScoreWidgetProvider extends AppWidgetProvider {
 
 
         // Instruct the widget manager to update the widget
-//        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,R.id.widget_list);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
         appWidgetManager.updateAppWidget(appWidgetId, views);
-
-
     }
 
     @Override
@@ -52,20 +49,9 @@ public class ScoreWidgetProvider extends AppWidgetProvider {
         Timber.d("Widget onUpdate");
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
         }
 
         super.onUpdate(context, appWidgetManager, appWidgetIds);
-    }
-
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
     }
 
     private static void setRemoteAdapter(Context context, @NonNull final RemoteViews views) {
