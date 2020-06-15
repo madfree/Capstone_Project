@@ -27,6 +27,8 @@ public class Constants {
     public static final String KEY_WRONG_ANSWER_3_STRING = "wrong_answer_3_string";
     public static final String KEY_CATEGORY_STRING = "category_string";
     public static final String KEY_DIFFICULTY_STRING = "difficulty_string";
+    public static final String KEY_CATEGORY_RANDOM = "Random category";
+    public static final String KEY_DIFFICULTY_RANDOM = "Random difficulty";
 
     public static final int DEFAULT_QUESTION_LENGTH = 300;
     public static final int DEFAULT_ANSWER_LENGTH = 30;

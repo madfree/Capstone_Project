@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -23,9 +22,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import timber.log.Timber;
 
-public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFirebaseTaskComplete {
-
-    private static final String TAG = QuizViewModel.class.getSimpleName();
+public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFirebaseDownloadTaskComplete {
 
     private MutableLiveData<List<Trivia>> mTriviaLiveData = new MutableLiveData<>();
     private List<Trivia> mTriviaList;
@@ -61,6 +58,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
 
     public QuizViewModel(String selectedCategory, String selectedDifficulty) {
         Timber.d("Initialize QuizViewModel");
+
         this.selectedDifficulty = selectedDifficulty;
         mFirebaseRepository.getQuizData(selectedCategory);
 
@@ -85,7 +83,6 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
     public void QuizDataAdded(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
             mTriviaList = new ArrayList<>();
-//            imageFiles = new ArrayList<>();
             Timber.d("Receiving data snapshot with this number of children: %s",
                     dataSnapshot.getChildrenCount());
             Timber.d("Initializing the trivia list");
@@ -93,21 +90,23 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
                 Trivia trivia = triviaSnapshot.getValue(Trivia.class);
                 if (trivia.getDifficulty().equals(selectedDifficulty)) {
                     mTriviaList.add(trivia);
-//                    if (trivia.getImage_url() != null) {
-//                        File triviaImageFile = mFirebaseRepository.getImageData(trivia.getImage_url());
-//                        imageFiles.add(triviaImageFile);
-//                    }
-
                     Timber.d("This is the question: %s", trivia.getQuestion());
                     Timber.d("This is the number of trivia: %s", mTriviaList.size());
                 }
             }
-            Timber.d("returning trivia list with items: %s", mTriviaList.size());
-            mTriviaDataListSize = mTriviaList.size();
-//            mTriviaLiveData.setValue(mTriviaList);
-            incrementTriviaCount();
-            mTriviaCounter.setValue(1);
-            countDownTimer.start();
+            if (mTriviaList.size() == 0) {
+                Timber.d("No trivias for this category and difficulty found");
+                mTriviaCounter.setValue(-2);
+            } else {
+                Timber.d("returning trivia list with items: %s", mTriviaList.size());
+                mTriviaDataListSize = mTriviaList.size();
+                incrementTriviaCount();
+//            mTriviaCounter.setValue(1);
+                countDownTimer.start();
+            }
+        } else {
+            mTriviaCounter.setValue(-2);
+            Timber.d("No trivias for this category received");
         }
     }
 

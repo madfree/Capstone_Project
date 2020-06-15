@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import timber.log.Timber;
 
 public class HomeFragment extends Fragment {
 
@@ -48,12 +49,38 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 requireActivity().getViewModelStore().clear();
                 Fragment quizFragment = new QuizFragment();
+                Bundle args = new Bundle();
                 String selectedCategory = categorySpinner.getSelectedItem().toString();
                 String selectedDifficulty = difficultySpinner.getSelectedItem().toString();
 
-                Bundle args = new Bundle();
-                args.putString(Constants.KEY_CATEGORY_STRING, selectedCategory);
-                args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
+                if (selectedCategory.equals("Random category")) {
+                    String[] categories = getResources().getStringArray(R.array.category_array);
+                    int maxNum = categories.length;
+                    int minNum = 1;
+                    int range = maxNum - minNum;
+                    int randomNum = (int) (Math.random() * range) + minNum;
+                    String randomCategory = categories[randomNum];
+                    args.putString(Constants.KEY_CATEGORY_STRING, randomCategory);
+                    Timber.d("Selected random category: %s", randomCategory);
+                } else {
+                    args.putString(Constants.KEY_CATEGORY_STRING, selectedCategory);
+                }
+
+                if (selectedDifficulty.equals("Random difficulty")) {
+                    String[] difficulties = getResources().getStringArray(R.array.difficulty_array);
+                    int maxNum = difficulties.length;
+                    int minNum = 1;
+                    int range = maxNum - minNum;
+                    int randomNum = (int) (Math.random() * range) + minNum;
+                    String randomDifficulty = difficulties[randomNum];
+                    args.putString(Constants.KEY_DIFFICULTY_STRING, randomDifficulty);
+                    Timber.d("Selected random difficulty: %s", randomDifficulty);
+                } else {
+                    args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
+                }
+
+
+
                 quizFragment.setArguments(args);
 
                 FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();

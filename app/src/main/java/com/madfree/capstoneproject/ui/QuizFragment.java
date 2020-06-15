@@ -20,7 +20,6 @@ import com.madfree.capstoneproject.data.Trivia;
 import com.madfree.capstoneproject.viewmodel.QuizViewModel;
 import com.madfree.capstoneproject.viewmodel.QuizViewModelFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,13 +125,17 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         disableUI();
 
-        quizViewModel.getTriviaNumber().observe(this, new Observer<Integer>() {
+        quizViewModel.getTriviaNumber().observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if (integer == -1) {
                     Timber.d("Quiz finished: %s", integer);
                     quizViewModel.cancelCountDown();
                     showResult();
+                } else if (integer == -2) {
+                    progressBar.setVisibility(View.GONE);
+                    question_text_view.setVisibility(View.VISIBLE);
+                    question_text_view.setText("Oh no! No trivias found for your selection. Please try again!");
                 } else {
                     isQuizFinished = false;
                     Timber.d("Receiving the new trivia number from ViewModel: %s", integer);
@@ -143,7 +146,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        quizViewModel.getTimeLeftInMillisLiveData().observe(this,
+        quizViewModel.getTimeLeftInMillisLiveData().observe(getViewLifecycleOwner(),
                 new Observer<Long>() {
                     @Override
                     public void onChanged(Long aLong) {
@@ -166,17 +169,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         answerList.add(currentTrivia.getWrong_answer_2());
         answerList.add(currentTrivia.getWrong_answer_3());
         Collections.shuffle(answerList);
-
-//        if (quizViewModel.getCurrentTriviaImage() == null) {
-//            question_image_view.setVisibility(View.GONE);
-//        } else {
-//            question_image_view.setVisibility(View.VISIBLE);
-//            String filePath = quizViewModel.getCurrentTriviaImage();
-//            Timber.d("Trivia image path is %s", filePath);
-//            Glide.with(this)
-//                    .load(filePath)
-//                    .into(question_image_view);
-//        }
 
         if (currentTrivia.getImage_url() != null) {
             Glide.with(this)

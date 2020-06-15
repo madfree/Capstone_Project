@@ -1,5 +1,7 @@
 package com.madfree.capstoneproject.ui;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -11,48 +13,50 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.madfree.capstoneproject.util.Constants;
 import com.madfree.capstoneproject.R;
-import com.madfree.capstoneproject.worker.CollectTriviaDataWorker;
-import com.madfree.capstoneproject.worker.SendTriviaToDbWorker;
-import com.madfree.capstoneproject.worker.UploadImageWorker;
-
-import java.util.Arrays;
+import com.madfree.capstoneproject.viewmodel.SubmitViewModel;
+import com.madfree.capstoneproject.viewmodel.SubmitViewModelFactory;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.OverwritingInputMerger;
-import androidx.work.WorkManager;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 
 public class SubmitFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
+    private SubmitViewModel submitViewModel;
+    private Application mApplication;
+
     private String mSelectedCategory;
     private String mSelectedDifficulty;
 
-    // TODO: Implement method to check if all fields are filled before submit button is activated
-    private boolean isEveryFieldFilled;
-
+    private TextView mNewTriviaTitleTextView;
     private EditText mQuestionEditText;
     private EditText mAnswerEditText;
     private EditText mWrong1EditText;
     private EditText mWrong2EditText;
     private EditText mWrong3EditText;
+    private TextView mImageHint;
+    private TextView mUploadSuccessTextView;
+    private ImageView mCheckSuccessImageView;
+    private ImageButton mPhotoPickerButton;
+    private Button mSubmitButton;
+    private Button mNewTriviaButton;
 
     private Spinner mCategorySpinner;
     private Spinner mDifficultySpinner;
-
-    private ImageButton mPhotoPickerButton;
-    private Button mSubmitButton;
 
     private Data mImageUploadInputData;
 
@@ -64,6 +68,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
         View view = inflater.inflate(R.layout.fragment_submit, container, false);
 
+        mNewTriviaTitleTextView = view.findViewById(R.id.text_view_new_trivia_title);
         mQuestionEditText = view.findViewById(R.id.edit_text_new_question);
         mAnswerEditText = view.findViewById(R.id.edit_text_correct_answer);
         mWrong1EditText = view.findViewById(R.id.edit_text_wrong_answer_1);
@@ -72,6 +77,15 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mPhotoPickerButton = view.findViewById(R.id.photoPickerButton);
         mCategorySpinner = view.findViewById(R.id.spinner_category);
         mDifficultySpinner = view.findViewById(R.id.spinner_difficulty);
+        mImageHint = view.findViewById(R.id.text_view_image_hint);
+
+        mUploadSuccessTextView = view.findViewById(R.id.upload_success_text_view);
+        mCheckSuccessImageView = view.findViewById(R.id.upload_success_image_view);
+        mNewTriviaButton = view.findViewById(R.id.new_trivia_button);
+
+        mUploadSuccessTextView.setVisibility(View.GONE);
+        mCheckSuccessImageView.setVisibility(View.GONE);
+        mNewTriviaButton.setVisibility(View.GONE);
 
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.
                 createFromResource(view.getContext(), R.array.category_array, android.R.layout.simple_spinner_item);
@@ -92,6 +106,13 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mWrong3EditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.DEFAULT_ANSWER_LENGTH)});
         mSubmitButton = view.findViewById(R.id.button_submit);
 
+        mApplication = getActivity().getApplication();
+        submitViewModel = new ViewModelProvider(requireActivity(), new SubmitViewModelFactory(mApplication)).get(SubmitViewModel.class);
+
+        if (submitViewModel.getImageUploadInputData() != null) {
+            mImageUploadInputData = submitViewModel.getImageUploadInputData();
+            mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_check_green));;
+        }
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,33 +128,40 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mSelectedCategory.equals(Constants.KEY_CATEGORY_RANDOM) || mSelectedDifficulty.equals(Constants.KEY_DIFFICULTY_RANDOM) ||
+                        mQuestionEditText.getText().toString().equals("") || mAnswerEditText.getText().toString().equals("") ||
+                        mWrong1EditText.getText().toString().equals("") || mWrong2EditText.getText().toString().equals("") ||
+                        mWrong3EditText.getText().toString().equals(""))
+                {
+                    Toast.makeText(requireContext(), "Please fill all fields and select a category and difficulty", Toast.LENGTH_LONG).show();
+                } else {
+                    String question = mQuestionEditText.getText().toString();
+                    String answer = mAnswerEditText.getText().toString();
+                    String wrong_answer_1 = mWrong1EditText.getText().toString();
+                    String wrong_answer_2 = mWrong2EditText.getText().toString();
+                    String wrong_answer_3 = mWrong3EditText.getText().toString();
+                    submitViewModel.submitTriviaToDb(question, answer, wrong_answer_1, wrong_answer_2, wrong_answer_3, mSelectedCategory, mSelectedDifficulty);
+                }
+            }
+        });
 
-                Data triviaTextData = new Data.Builder()
-                        .putString(Constants.KEY_QUESTION_STRING, mQuestionEditText.getText().toString())
-                        .putString(Constants.KEY_CORRECT_ANSWER_STRING, mAnswerEditText.getText().toString())
-                        .putString(Constants.KEY_WRONG_ANSWER_1_STRING, mWrong1EditText.getText().toString())
-                        .putString(Constants.KEY_WRONG_ANSWER_2_STRING, mWrong2EditText.getText().toString())
-                        .putString(Constants.KEY_WRONG_ANSWER_3_STRING, mWrong3EditText.getText().toString())
-                        .putString(Constants.KEY_CATEGORY_STRING, mSelectedCategory)
-                        .putString(Constants.KEY_DIFFICULTY_STRING, mSelectedDifficulty)
-                        .build();
+        mNewTriviaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInitialUI();
+            }
+        });
 
-                OneTimeWorkRequest uploadImageRequest = new OneTimeWorkRequest.Builder(UploadImageWorker.class)
-                        .setInputData(mImageUploadInputData)
-                        .build();
-
-                OneTimeWorkRequest collectTriviaDataRequest = new OneTimeWorkRequest.Builder(CollectTriviaDataWorker.class)
-                        .setInputData(triviaTextData)
-                        .build();
-
-                OneTimeWorkRequest sendTriviaToDatabaseRequest = new OneTimeWorkRequest.Builder(SendTriviaToDbWorker.class)
-                        .setInputMerger(OverwritingInputMerger.class)
-                        .build();
-
-                WorkManager.getInstance(requireActivity())
-                        .beginWith(Arrays.asList(uploadImageRequest, collectTriviaDataRequest))
-                        .then(sendTriviaToDatabaseRequest)
-                        .enqueue();
+        submitViewModel.getIsUploadComplete().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean uploadComplete) {
+                if (uploadComplete) {
+                    Toast.makeText(getContext(),"Trivia successfully added to database!", Toast.LENGTH_LONG).show();
+                    showSuccessUI();
+                    submitViewModel.resetIsUploadComplete();
+                } else {
+                    Toast.makeText(getContext(), "Couldn't add trivia to database. Please try again later.", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -142,14 +170,8 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        if(adapterView.getId() == R.id.spinner_category)
-        {
-            mSelectedCategory = adapterView.getItemAtPosition(position).toString();
-        }
-        else if(adapterView.getId() == R.id.spinner_difficulty)
-        {
-            mSelectedDifficulty= adapterView.getItemAtPosition(position).toString();
-        }
+        if(adapterView.getId() == R.id.spinner_category) { mSelectedCategory = adapterView.getItemAtPosition(position).toString(); }
+        else if(adapterView.getId() == R.id.spinner_difficulty) { mSelectedDifficulty= adapterView.getItemAtPosition(position).toString(); }
     }
 
     @Override
@@ -162,9 +184,56 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-            mImageUploadInputData = new Data.Builder()
-                    .putString(Constants.KEY_IMAGE_URI, data.getData().toString())
-                    .build();
+            submitViewModel.setImageUploadInputData(data);
+            mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_check_green));
         }
+    }
+
+    private void clearAll() {
+        mQuestionEditText.getText().clear();
+        mAnswerEditText.getText().clear();
+        mWrong1EditText.getText().clear();
+        mWrong2EditText.getText().clear();
+        mWrong3EditText.getText().clear();
+        mCategorySpinner.setSelection(0);
+        mDifficultySpinner.setSelection(0);
+    }
+
+    private void showSuccessUI() {
+        mUploadSuccessTextView.setVisibility(View.VISIBLE);
+        mCheckSuccessImageView.setVisibility(View.VISIBLE);
+        mNewTriviaButton.setVisibility(View.VISIBLE);
+
+        mNewTriviaTitleTextView.setVisibility(View.GONE);
+        mQuestionEditText.setVisibility(View.GONE);
+        mAnswerEditText.setVisibility(View.GONE);
+        mWrong1EditText.setVisibility(View.GONE);
+        mWrong2EditText.setVisibility(View.GONE);
+        mWrong3EditText.setVisibility(View.GONE);
+        mPhotoPickerButton.setVisibility(View.GONE);
+        mCategorySpinner.setVisibility(View.GONE);
+        mDifficultySpinner.setVisibility(View.GONE);
+        mImageHint.setVisibility(View.GONE);
+        mSubmitButton.setVisibility(View.GONE);
+        clearAll();
+        mImageUploadInputData = null;
+    }
+
+    private void showInitialUI() {
+        mUploadSuccessTextView.setVisibility(View.GONE);
+        mCheckSuccessImageView.setVisibility(View.GONE);
+        mNewTriviaButton.setVisibility(View.GONE);
+
+        mNewTriviaTitleTextView.setVisibility(View.VISIBLE);
+        mQuestionEditText.setVisibility(View.VISIBLE);
+        mAnswerEditText.setVisibility(View.VISIBLE);
+        mWrong1EditText.setVisibility(View.VISIBLE);
+        mWrong2EditText.setVisibility(View.VISIBLE);
+        mWrong3EditText.setVisibility(View.VISIBLE);
+        mPhotoPickerButton.setVisibility(View.VISIBLE);
+        mCategorySpinner.setVisibility(View.VISIBLE);
+        mDifficultySpinner.setVisibility(View.VISIBLE);
+        mImageHint.setVisibility(View.VISIBLE);
+        mSubmitButton.setVisibility(View.VISIBLE);
     }
 }

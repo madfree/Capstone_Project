@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     .setAvailableProviders(Arrays.asList(
                                             new AuthUI.IdpConfig.GoogleBuilder().build(),
                                             new AuthUI.IdpConfig.EmailBuilder().build()))
+                                    .setTheme(R.style.AppTheme_NoActionBar)
+                                    .setLogo(R.mipmap.logo_small)
                                     .build(),
                             Constants.RC_SIGN_IN);
                 }

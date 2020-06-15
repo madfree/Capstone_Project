@@ -21,7 +21,8 @@ import timber.log.Timber;
 
 public class FirebaseRepository {
 
-    private OnFirebaseTaskComplete onFirebaseTaskComplete;
+    private OnFirebaseDownloadTaskComplete onFirebaseTaskComplete;
+    private OnTriviaUploadTaskComplete onTriviaUploadTaskComplete;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
@@ -31,7 +32,11 @@ public class FirebaseRepository {
     public static final DatabaseReference userReference =
             FirebaseDatabase.getInstance().getReference("users");
 
-    public FirebaseRepository(OnFirebaseTaskComplete onFirebaseTaskComplete) {
+    public FirebaseRepository(OnTriviaUploadTaskComplete onTriviaUploadTaskComplete) {
+        this.onTriviaUploadTaskComplete = onTriviaUploadTaskComplete;
+    }
+
+    public FirebaseRepository(OnFirebaseDownloadTaskComplete onFirebaseTaskComplete) {
         this.onFirebaseTaskComplete = onFirebaseTaskComplete;
     }
 
@@ -89,8 +94,28 @@ public class FirebaseRepository {
         return localTriviaImage;
     }
 
-    public interface OnFirebaseTaskComplete {
+    public void addTriviaToDb(Trivia trivia) {
+        triviaReference.push().setValue(trivia).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                onTriviaUploadTaskComplete.TriviaAdded(true);
+                Timber.d("Trivia send successfully to Firebase Realtime Database");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                onTriviaUploadTaskComplete.TriviaAdded(false);
+                Timber.d(e, "Error sending trivia to Firebase Realtime Database");
+            }
+        });
+    }
+
+    public interface OnFirebaseDownloadTaskComplete {
         void QuizDataAdded(DataSnapshot dataSnapshot);
+    }
+
+    public interface OnTriviaUploadTaskComplete {
+        void TriviaAdded(boolean uploadSuccessful);
     }
 
 }

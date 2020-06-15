@@ -46,7 +46,7 @@ public class RankingFragment extends Fragment {
         rankingViewModel = new ViewModelProvider(requireActivity()).get(RankingViewModel.class);
         Timber.d("Initialize QuizViewModel");
 
-        rankingViewModel.getUserRankLiveData().observe(this, new Observer<List<User>>() {
+        rankingViewModel.getUserRankLiveData().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
                 layoutManager = new LinearLayoutManager(requireActivity());
