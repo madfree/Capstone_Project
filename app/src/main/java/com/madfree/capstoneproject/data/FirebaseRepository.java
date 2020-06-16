@@ -56,7 +56,8 @@ public class FirebaseRepository {
     }
 
     public void getUserData() {
-        userReference.addValueEventListener(new ValueEventListener() {
+        Query userQuery = userReference.orderByChild("totalScore");
+        userQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 onFirebaseTaskComplete.QuizDataAdded(dataSnapshot);
@@ -72,7 +73,6 @@ public class FirebaseRepository {
     }
 
     public File getImageData(String imageUrl) {
-//        StorageReference triviaImageRef = mFirebaseStorage.getReference().child("trivia_images");
         StorageReference imageRef = mFirebaseStorage.getReferenceFromUrl(imageUrl);
         File localTriviaImage = null;
         try {

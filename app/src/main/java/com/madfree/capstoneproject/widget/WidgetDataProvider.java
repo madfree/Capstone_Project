@@ -17,6 +17,7 @@ import com.madfree.capstoneproject.R;
 import com.madfree.capstoneproject.data.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,8 +55,8 @@ public class WidgetDataProvider implements RemoteViewsFactory {
                         User user = userSnapshot.getValue(User.class);
                         mUserList.add(user);
                         Timber.d("Widget: Add user to list: %s", user.getUserName());
-
                     }
+                    Collections.reverse(mUserList);
                     Timber.d("Widget: Return user list with size: %s", mUserList.size());
                     countDown.countDown();
                 }
