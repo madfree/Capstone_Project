@@ -78,12 +78,10 @@ public class HomeFragment extends Fragment {
                 } else {
                     args.putString(Constants.KEY_DIFFICULTY_STRING, selectedDifficulty);
                 }
-
-
-
                 quizFragment.setArguments(args);
 
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager()
+                        .beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                 transaction.replace(R.id.fragment_container, quizFragment);
                 transaction.addToBackStack(null).commit();
             }

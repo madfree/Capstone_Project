@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="0"
+        android:text="@string/initial_question_counter_text"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="/"
+        android:text="@string/counter_divider"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@id/text_view_question_count"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="0"
+        android:text="@string/initial_total_question_count"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@id/text_view_separator"
         app:layout_constraintTop_toTopOf="parent" />
@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="30"
+        android:text="@string/initial_time"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -63,7 +63,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_marginTop="20dp"
-        android:text="A sample question?"
+        android:text="@string/sample_question_text"
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@id/answer_layout"
         app:layout_constraintEnd_toStartOf="@+id/image_view_question"
@@ -102,7 +102,7 @@
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="answer 1"
+            android:text="@string/sample_answer_1"
             android:textColor="@android:color/white" />
 
         <Button
@@ -113,7 +113,7 @@
             android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="answer 2"
+            android:text="@string/sample_answer_2"
             android:textColor="@android:color/white" />
 
         <Button
@@ -123,7 +123,7 @@
             android:layout_margin="4dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="answer 3"
+            android:text="@string/sample_answer_3"
             android:textColor="@android:color/white" />
 
         <Button
@@ -134,7 +134,7 @@
             android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="answer 4"
+            android:text="@string/sample_answer_4"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

@@ -19,10 +19,25 @@
     <string name="welcome_play_text">Select a category and a difficulty or play a random game.</string>
     <string name="button_play_text">Play</string>
 
+    !--    Quiz fragment-->
+    <string name="initial_question_counter_text">0</string>
+    <string name="counter_divider">/</string>
+    <string name="initial_total_question_count">0</string>
+    <string name="initial_time">00</string>
+    <string name="sample_question_text">A sample question?</string>
+    <string name="sample_answer_1">answer 1</string>
+    <string name="sample_answer_2">answer 2</string>
+    <string name="sample_answer_3">answer 3</string>
+    <string name="sample_answer_4">answer 4</string>
+    <string name="empty_quiz_string">Oh no! No trivias found for your selection. Please try again!</string>
+
 <!--    Result screen-->
     <string name="result_title">Quiz result</string>
     <string name="result_default">00</string>
     <string name="play_again_text">Play Again</string>
+    <string name="you_played">You played:</string>
+    <string name="result_category">Category:</string>
+    <string name="result_difficulty">Difficulty:</string>
 
 <!--    Submit new trivia form-->
     <string name="submit_new_trivia_title">Submit new trivia</string>

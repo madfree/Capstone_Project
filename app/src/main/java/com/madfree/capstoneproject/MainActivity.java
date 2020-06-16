@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -145,15 +144,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.nav_home:
-                getSupportFragmentManager().beginTransaction()
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .replace(R.id.fragment_container, new HomeFragment()).commit();
                 break;
             case R.id.nav_submit:
-                getSupportFragmentManager().beginTransaction()
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .replace(R.id.fragment_container, new SubmitFragment()).addToBackStack(null).commit();
                 break;
             case R.id.nav_ranking:
-                getSupportFragmentManager().beginTransaction()
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .replace(R.id.fragment_container, new RankingFragment()).addToBackStack(null).commit();
                 break;
             case R.id.nav_logout:
@@ -173,4 +172,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
 }

@@ -1,5 +1,7 @@
 package com.madfree.capstoneproject.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +48,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private ImageView clock_image_view;
     private TextView countdown_timer_text_view;
     private TextView question_text_view;
+    private View answerOptionsView;
     private Button question_answer_1;
     private Button question_answer_2;
     private Button question_answer_3;
@@ -57,6 +60,10 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private boolean isQuizFinished;
     private int mTriviaCount;
     private long backPressedTime;
+
+    private int shortAnimationDuration;
+    private int mediumAnimationDuration;
+    private int longAnimationDuration;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,6 +107,10 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
 
+        shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        longAnimationDuration = getResources().getInteger(android.R.integer.config_longAnimTime);
+        mediumAnimationDuration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -117,6 +128,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_2 = view.findViewById(R.id.button_answer_2);
         question_answer_3 = view.findViewById(R.id.button_answer_3);
         question_answer_4 = view.findViewById(R.id.button_answer_4);
+        answerOptionsView = view.findViewById(R.id.answer_layout);
 
         question_answer_1.setOnClickListener(this);
         question_answer_2.setOnClickListener(this);
@@ -133,9 +145,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                     quizViewModel.cancelCountDown();
                     showResult();
                 } else if (integer == -2) {
-                    progressBar.setVisibility(View.GONE);
+                    hideProgressBar();
                     question_text_view.setVisibility(View.VISIBLE);
-                    question_text_view.setText("Oh no! No trivias found for your selection. Please try again!");
+                    question_text_view.setText(R.string.empty_quiz_string);
                 } else {
                     isQuizFinished = false;
                     Timber.d("Receiving the new trivia number from ViewModel: %s", integer);
@@ -175,7 +187,12 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                     .load(currentTrivia.getImage_url())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(question_image_view);
+            question_image_view.setAlpha(0f);
             question_image_view.setVisibility(View.VISIBLE);
+            question_image_view.animate()
+                    .alpha(1f)
+                    .setDuration(mediumAnimationDuration)
+                    .setListener(null);
         } else {
             question_image_view.setVisibility(View.GONE);
         }
@@ -185,6 +202,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         question_answer_2.setText(answerList.get(1));
         question_answer_3.setText(answerList.get(2));
         question_answer_4.setText(answerList.get(3));
+
         showTriviaUI();
     }
 
@@ -224,6 +242,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void showTriviaUI() {
         int listSize = quizViewModel.getTriviaDataListSize();
+
         questions_count_text_view_total.setText(String.valueOf(listSize));
         questions_count_text_view.setVisibility(View.VISIBLE);
         separator_text_view.setVisibility(View.VISIBLE);
@@ -232,29 +251,44 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         clock_image_view.setVisibility(View.VISIBLE);
         countdown_timer_text_view.setVisibility(View.VISIBLE);
 
-        question_text_view.setVisibility(View.VISIBLE);
+        crossfadeView(question_text_view);
+        crossfadeView(answerOptionsView);
 
-        question_answer_1.setVisibility(View.VISIBLE);
-        question_answer_2.setVisibility(View.VISIBLE);
-        question_answer_3.setVisibility(View.VISIBLE);
-        question_answer_4.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
+        hideProgressBar();
     }
 
     private void disableUI() {
-        questions_count_text_view.setVisibility(View.INVISIBLE);
-        separator_text_view.setVisibility(View.INVISIBLE);
-        questions_count_text_view_total.setVisibility(View.INVISIBLE);
+        questions_count_text_view.setVisibility(View.GONE);
+        separator_text_view.setVisibility(View.GONE);
+        questions_count_text_view_total.setVisibility(View.GONE);
 
-        clock_image_view.setVisibility(View.INVISIBLE);
-        countdown_timer_text_view.setVisibility(View.INVISIBLE);
+        clock_image_view.setVisibility(View.GONE);
+        countdown_timer_text_view.setVisibility(View.GONE);
 
-        question_text_view.setVisibility(View.INVISIBLE);
+        question_text_view.setVisibility(View.GONE);
 
-        question_answer_1.setVisibility(View.INVISIBLE);
-        question_answer_2.setVisibility(View.INVISIBLE);
-        question_answer_3.setVisibility(View.INVISIBLE);
-        question_answer_4.setVisibility(View.INVISIBLE);
+        answerOptionsView.setVisibility(View.GONE);
+    }
+
+    private void crossfadeView(View view) {
+        view.setAlpha(0f);
+        view.setVisibility(View.VISIBLE);
+        view.animate()
+                .alpha(1f)
+                .setDuration(mediumAnimationDuration)
+                .setListener(null);
+    }
+
+    private void hideProgressBar() {
+        progressBar.animate()
+                .alpha(0f)
+                .setDuration(shortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void updateCountDownText(long timeLeftInMillis) {

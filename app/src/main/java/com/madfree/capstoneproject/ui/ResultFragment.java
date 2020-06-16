@@ -83,7 +83,8 @@ public class ResultFragment extends Fragment {
     private void returnHome() {
         requireActivity().getViewModelStore().clear();
         Fragment homeFragment = new HomeFragment();
-        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager()
+                .beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
         transaction.replace(R.id.fragment_container, homeFragment);
         transaction.commit();
     }

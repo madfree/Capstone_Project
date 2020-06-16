@@ -85,7 +85,7 @@ public class FirebaseRepository {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Timber.d("Image download failed");
+                    Timber.e("Image download failed");
                 }
             });
         } catch (IOException e) {
@@ -105,7 +105,7 @@ public class FirebaseRepository {
             @Override
             public void onFailure(@NonNull Exception e) {
                 onTriviaUploadTaskComplete.TriviaAdded(false);
-                Timber.d(e, "Error sending trivia to Firebase Realtime Database");
+                Timber.e(e, "Error sending trivia to Firebase Realtime Database");
             }
         });
     }
