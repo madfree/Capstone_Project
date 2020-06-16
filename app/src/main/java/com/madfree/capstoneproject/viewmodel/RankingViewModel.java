@@ -1,19 +1,15 @@
 package com.madfree.capstoneproject.viewmodel;
 
 import com.google.firebase.database.DataSnapshot;
-import com.madfree.capstoneproject.data.FirebaseQueryLiveData;
 import com.madfree.capstoneproject.data.FirebaseRepository;
 import com.madfree.capstoneproject.data.User;
-import com.madfree.capstoneproject.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import timber.log.Timber;
 

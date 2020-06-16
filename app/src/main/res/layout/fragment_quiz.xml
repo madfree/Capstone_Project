@@ -51,6 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_timer_black"
+        android:paddingStart="8dp"
         android:paddingEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@id/text_view_timer_countdown"
         app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown"

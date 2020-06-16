@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Qwizard</string>
 
+<!--    categories and difficulties-->
     <string-array name="category_array">
         <item>Random category</item>
         <item>Geography</item>
@@ -14,20 +15,47 @@
         <item>Hard</item>
     </string-array>
 
+<!--    Welcome screen-->
+    <string name="welcome_play_text">Select a category and a difficulty or play a random game.</string>
+    <string name="button_play_text">Play</string>
+
+<!--    Result screen-->
+    <string name="result_title">Result</string>
+    <string name="result_default">0</string>
+    <string name="play_again_text">Play Again</string>
+
+<!--    Submit new trivia form-->
+    <string name="submit_new_trivia_title">Submit new trivia</string>
+    <string name="new_question_hint">Enter a question</string>
+    <string name="new_image_hint">Add an image</string>
+    <string name="new_correct_answer_hint">correct answer</string>
+    <string name="new_wrong_answer_1_hint">wrong answer 1</string>
+    <string name="new_wrong_answer_2_hint">wrong answer 2</string>
+    <string name="new_wrong_answer_3_hint">wrong answer 3</string>
+    <string name="new_trivia_submit_button_text">Submit</string>
+    <string name="new_trivia_success_icon_desc">trivia upload was successful</string>
+    <string name="new_trivia_success">Success!</string>
+    <string name="new_trivia_button_add">New trivia</string>
+
+<!--    Navigation Drawer-->
+    <string name="home_link">Home</string>
+    <string name="ranking_link">Ranking</string>
+    <string name="submit_trivia_link">Submit trivia</string>
+    <string name="logout_link">Logout</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+<!--    Widget and ranking -->
     <string name="appwidget_text">Top 10</string>
     <string name="add_widget">Add widget</string>
     <string name="widget_empty_string">No data to display. Please sign in!</string>
-    <string name="score">Score</string>
-    <string name="player">Player</string>
     <string name="widget_rank">#</string>
-    <string name="welcome_play_text">Select a category and a difficulty or play a random game.</string>
-    <string name="button_play_text">Play</string>
+
     <string name="ranking_title">RANKING</string>
     <string name="rank">Rank</string>
+    <string name="player">Player</string>
+    <string name="score">Score</string>
     <string name="games">Games</string>
-    <string name="play_again_text">Play Again</string>
 
 </resources>

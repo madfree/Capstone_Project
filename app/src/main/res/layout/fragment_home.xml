@@ -60,7 +60,7 @@
         android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:backgroundTint="@color/colorAccent"
-        android:drawableLeft="@drawable/ic_play_white"
+        android:drawableStart="@drawable/ic_play_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
