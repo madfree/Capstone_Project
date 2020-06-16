@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (user != null) {
                     // the user is signed in
                     mUserImageUrl = user.getPhotoUrl();
-                    Glide.with(MainActivity.this)
+                    Glide.with(getApplicationContext())
                             .load(mUserImageUrl)
                             .apply(RequestOptions.circleCropTransform())
                             .into(mUserImageView);

@@ -45,7 +45,7 @@ public class WidgetDataProvider implements RemoteViewsFactory {
         countDown = new CountDownLatch(1);
         try {
             DatabaseReference userRef = db.getReference("users");
-            Query rankingQuery = userRef.orderByChild("totalScore");
+            Query rankingQuery = userRef.orderByChild("totalScore").limitToLast(10);
             rankingQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -53,7 +53,7 @@ public class WidgetDataProvider implements RemoteViewsFactory {
                     Timber.d("Widget: Returning data from Firebase");
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
-                        mUserList.add(user);
+                            mUserList.add(user);
                         Timber.d("Widget: Add user to list: %s", user.getUserName());
                     }
                     Collections.reverse(mUserList);

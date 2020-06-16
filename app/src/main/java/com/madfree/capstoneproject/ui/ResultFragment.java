@@ -22,10 +22,14 @@ import timber.log.Timber;
 public class ResultFragment extends Fragment {
 
     private TextView mScoreTextView;
+    private TextView mCategoryTextView;
+    private TextView mDifficultyTextView;
     private Button mHomeButton;
 
     private QuizViewModel quizViewModel;
     private int mQuizScore;
+    private String mQuizCategory;
+    private String mQuizDifficulty;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,13 +54,21 @@ public class ResultFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_result, container, false);
         mScoreTextView = view.findViewById(R.id.text_view_score);
+        mCategoryTextView = view.findViewById(R.id.category_text_view);
+        mDifficultyTextView = view.findViewById(R.id.difficulty_text_view);
         mHomeButton = view.findViewById(R.id.button_home);
 
         quizViewModel = new ViewModelProvider(requireActivity()).get(QuizViewModel.class);
 
         quizViewModel.setHighScore();
+
         mQuizScore = quizViewModel.getQuizScore();
+        mQuizCategory = quizViewModel.getSelectedCategory();
+        mQuizDifficulty = quizViewModel.getSelectedDifficulty();
+
         mScoreTextView.setText(String.valueOf(mQuizScore));
+        mCategoryTextView.setText(mQuizCategory);
+        mDifficultyTextView.setText(mQuizDifficulty);
 
         mHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override

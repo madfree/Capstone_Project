@@ -21,7 +21,7 @@ public class RankingViewModel extends ViewModel implements FirebaseRepository.On
     private List<User> mUserList;
 
     public RankingViewModel() {
-        mFirebaseRepository.getUserData();
+        mFirebaseRepository.getUserRankingData();
     }
 
     @Override

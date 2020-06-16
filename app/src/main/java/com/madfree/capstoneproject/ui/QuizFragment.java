@@ -177,7 +177,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                     .into(question_image_view);
             question_image_view.setVisibility(View.VISIBLE);
         } else {
-            question_image_view.setVisibility(View.INVISIBLE);
+            question_image_view.setVisibility(View.GONE);
         }
 
         question_text_view.setText(currentTrivia.getQuestion());
@@ -233,7 +233,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         countdown_timer_text_view.setVisibility(View.VISIBLE);
 
         question_text_view.setVisibility(View.VISIBLE);
-        question_image_view.setVisibility(View.VISIBLE);
 
         question_answer_1.setVisibility(View.VISIBLE);
         question_answer_2.setVisibility(View.VISIBLE);
@@ -251,7 +250,6 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         countdown_timer_text_view.setVisibility(View.INVISIBLE);
 
         question_text_view.setVisibility(View.INVISIBLE);
-        question_image_view.setVisibility(View.INVISIBLE);
 
         question_answer_1.setVisibility(View.INVISIBLE);
         question_answer_2.setVisibility(View.INVISIBLE);

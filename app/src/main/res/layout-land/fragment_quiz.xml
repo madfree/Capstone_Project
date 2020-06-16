@@ -56,85 +56,88 @@
         app:layout_constraintEnd_toStartOf="@id/text_view_timer_countdown"
         app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown" />
 
-    <ImageView
-        android:id="@+id/image_view_question"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="4dp"
-        android:layout_marginTop="24dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_question_count"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
-
     <TextView
         android:id="@+id/text_view_question"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/image_view_question"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
         android:text="A sample question?"
-        android:textAlignment="center"
         android:textSize="22sp"
-        app:layout_constraintBottom_toTopOf="@+id/answer_layout"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_question_count"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintBottom_toTopOf="@id/answer_layout"
+        app:layout_constraintEnd_toStartOf="@+id/image_view_question"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_question_count" />
 
+    <ImageView
+        android:id="@+id/image_view_question"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:gravity="center"
+        android:padding="4dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/text_view_question"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/text_view_question"
+        app:layout_constraintTop_toTopOf="@+id/text_view_question"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/answer_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal|bottom"
+        android:gravity="bottom|center"
+        android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/text_view_question"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_view_question"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@id/text_view_question">
 
         <Button
             android:id="@+id/button_answer_1"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_margin="4dp"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="answer 1"
             android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/button_answer_2"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_margin="4dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/button_answer_1"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="answer 2"
             android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/button_answer_3"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_below="@id/button_answer_2"
             android:layout_margin="4dp"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="answer 3"
             android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/button_answer_4"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_below="@id/button_answer_2"
             android:layout_margin="4dp"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/button_answer_3"
+            android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="answer 4"
             android:textColor="@android:color/white" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

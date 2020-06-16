@@ -24,34 +24,25 @@ import timber.log.Timber;
 
 public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFirebaseDownloadTaskComplete {
 
+    private FirebaseRepository mFirebaseRepository = new FirebaseRepository(this);
+
     private MutableLiveData<List<Trivia>> mTriviaLiveData = new MutableLiveData<>();
+    private MutableLiveData<Integer> mTriviaCounter = new MutableLiveData<>();
+    private MutableLiveData<Long> mTimeLeftinMilisLiveData = new MutableLiveData<>();
+
     private List<Trivia> mTriviaList;
-
-    private User mUser;
-
-    private CountDownTimer countDownTimer;
-
-    private int mCurrentTriviaNumber = 0;
-    private int mTriviaDataListSize;
     private List<File> imageFiles;
 
-    // TODO: Variables need to get initialized with new MutableLiveData()
-    private MutableLiveData<Integer> mTriviaCounter = new MutableLiveData<>();
-
-    private MutableLiveData<Boolean> mQuizIsFinished = new MutableLiveData<>();
-    private MutableLiveData<Long> mTimeLeftinMilisLiveData = new MutableLiveData<>();
-    private Boolean isQuizFinished;
-    private MutableLiveData<Boolean> hasTriviaLiveData = new MutableLiveData<>();
-    private MutableLiveData<Trivia> triviaLiveData = new MutableLiveData<>();
-
-    private FirebaseRepository mFirebaseRepository = new FirebaseRepository(this);
+    private User mUser;
+    private CountDownTimer countDownTimer;
 
     private String mUid;
     private String mUserName;
     private String selectedCategory;
     private String selectedDifficulty;
 
-    private int triviaNumber;
+    private int mCurrentTriviaNumber = 0;
+    private int mTriviaDataListSize;
     private int mQuizScore;
     private int mTotalScore;
     private int mGamesPlayed;
@@ -59,6 +50,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
     public QuizViewModel(String selectedCategory, String selectedDifficulty) {
         Timber.d("Initialize QuizViewModel");
 
+        this.selectedCategory = selectedCategory;
         this.selectedDifficulty = selectedDifficulty;
         mFirebaseRepository.getQuizData(selectedCategory);
 
@@ -88,7 +80,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
             Timber.d("Initializing the trivia list");
             for (DataSnapshot triviaSnapshot : dataSnapshot.getChildren()) {
                 Trivia trivia = triviaSnapshot.getValue(Trivia.class);
-                if (trivia.getDifficulty().equals(selectedDifficulty)) {
+                if (trivia.getDifficulty().equals(selectedDifficulty) && mTriviaList.size() < 10) {
                     mTriviaList.add(trivia);
                     Timber.d("This is the question: %s", trivia.getQuestion());
                     Timber.d("This is the number of trivia: %s", mTriviaList.size());
@@ -193,7 +185,6 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                //TODO: log error
                 Timber.d("Firebase Database error: %s", databaseError);
             }
         });
@@ -219,6 +210,14 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
             mTimeLeftinMilisLiveData.setValue(0L);
         }
         return mTimeLeftinMilisLiveData;
+    }
+
+    public String getSelectedCategory() {
+        return selectedCategory;
+    }
+
+    public String getSelectedDifficulty() {
+        return selectedDifficulty;
     }
 
     @Override

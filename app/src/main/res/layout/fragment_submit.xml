@@ -7,166 +7,170 @@
     android:layout_width="match_parent"
     android:fillViewport="true">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/text_view_new_trivia_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/submit_new_trivia_title"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_new_question"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/text_view_new_trivia_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/submit_new_trivia_title"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_new_question"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/edit_text_new_question"
-            android:layout_width="200dp"
-            android:layout_height="100dp"
-            android:gravity="top|start"
-            android:hint="@string/new_question_hint"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@id/photoPickerButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_view_new_trivia_title" />
+                <EditText
+                    android:id="@+id/edit_text_new_question"
+                    android:layout_width="200dp"
+                    android:layout_height="100dp"
+                    android:gravity="top|start"
+                    android:hint="@string/new_question_hint"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toTopOf="@id/photoPickerButton"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_view_new_trivia_title" />
 
-        <TextView
-            android:id="@+id/text_view_image_hint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/new_image_hint"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_correct_answer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_new_question" />
+                <TextView
+                    android:id="@+id/text_view_image_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/new_image_hint"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_correct_answer"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/photoPickerButton"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_new_question" />
 
-        <ImageButton
-            android:id="@+id/photoPickerButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@android:drawable/ic_menu_gallery"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_correct_answer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/text_view_image_hint"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_new_question" />
+                <ImageButton
+                    android:id="@+id/photoPickerButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@android:drawable/ic_menu_gallery"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_correct_answer"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/text_view_image_hint"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_new_question" />
 
-        <EditText
-            android:id="@+id/edit_text_correct_answer"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/new_correct_answer_hint"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/photoPickerButton" />
+                <EditText
+                    android:id="@+id/edit_text_correct_answer"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_correct_answer_hint"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/photoPickerButton" />
 
-        <EditText
-            android:id="@+id/edit_text_wrong_answer_1"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/new_wrong_answer_1_hint"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_correct_answer" />
+                <EditText
+                    android:id="@+id/edit_text_wrong_answer_1"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_wrong_answer_1_hint"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_correct_answer" />
 
-        <EditText
-            android:id="@+id/edit_text_wrong_answer_2"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/new_wrong_answer_2_hint"
-            app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_1" />
+                <EditText
+                    android:id="@+id/edit_text_wrong_answer_2"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_wrong_answer_2_hint"
+                    app:layout_constraintBottom_toTopOf="@id/edit_text_wrong_answer_3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_1" />
 
-        <EditText
-            android:id="@+id/edit_text_wrong_answer_3"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/new_wrong_answer_3_hint"
-            app:layout_constraintBottom_toTopOf="@id/spinner_category"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_2" />
+                <EditText
+                    android:id="@+id/edit_text_wrong_answer_3"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_wrong_answer_3_hint"
+                    app:layout_constraintBottom_toTopOf="@id/spinner_category"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_2" />
 
-        <Spinner
-            android:id="@+id/spinner_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/spinner_difficulty"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_3" />
+                <Spinner
+                    android:id="@+id/spinner_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/spinner_difficulty"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/edit_text_wrong_answer_3" />
 
-        <Spinner
-            android:id="@+id/spinner_difficulty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/button_submit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spinner_category" />
+                <Spinner
+                    android:id="@+id/spinner_difficulty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/button_submit"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/spinner_category" />
 
 
-        <Button
-            android:id="@+id/button_submit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorAccent"
-            android:drawableLeft="@drawable/ic_send_white"
-            android:text="@string/new_trivia_submit_button_text"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spinner_difficulty" />
+                <Button
+                    android:id="@+id/button_submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:drawableLeft="@drawable/ic_send_white"
+                    android:text="@string/new_trivia_submit_button_text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/spinner_difficulty" />
 
-        <ImageView
-            android:id="@+id/upload_success_image_view"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:background="@drawable/ic_check_green"
-            android:contentDescription="@string/new_trivia_success_icon_desc"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/upload_success_image_view"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/ic_check_green"
+                    android:contentDescription="@string/new_trivia_success_icon_desc"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/upload_success_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/new_trivia_success"
-            android:textColor="@color/colorAccent"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/upload_success_image_view"
-            app:layout_constraintVertical_bias="0.0" />
+                <TextView
+                    android:id="@+id/upload_success_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_trivia_success"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/upload_success_image_view"
+                    app:layout_constraintVertical_bias="0.0" />
 
-        <Button
-            android:id="@+id/new_trivia_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/colorAccent"
-            android:text="@string/new_trivia_button_add"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/white"
-            app:layout_constraintTop_toBottomOf="@id/upload_success_text_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+                <Button
+                    android:id="@+id/new_trivia_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:text="@string/new_trivia_button_add"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/upload_success_text_view" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.core.widget.NestedScrollView>

@@ -55,8 +55,8 @@ public class FirebaseRepository {
         });
     }
 
-    public void getUserData() {
-        Query userQuery = userReference.orderByChild("totalScore");
+    public void getUserRankingData() {
+        Query userQuery = userReference.orderByChild("totalScore").limitToLast(100);
         userQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
