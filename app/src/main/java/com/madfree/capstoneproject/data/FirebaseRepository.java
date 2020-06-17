@@ -25,11 +25,11 @@ public class FirebaseRepository {
     private OnTriviaUploadTaskComplete onTriviaUploadTaskComplete;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
+    private FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
 
     private DatabaseReference triviaReference = firebaseDatabase.getReference().child(
             "trivia");
-    public static final DatabaseReference userReference =
+    private static final DatabaseReference userReference =
             FirebaseDatabase.getInstance().getReference("users");
 
     public FirebaseRepository(OnTriviaUploadTaskComplete onTriviaUploadTaskComplete) {

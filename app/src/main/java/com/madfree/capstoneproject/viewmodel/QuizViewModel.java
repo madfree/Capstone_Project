@@ -11,7 +11,6 @@ import com.madfree.capstoneproject.data.Trivia;
 import com.madfree.capstoneproject.data.User;
 import com.madfree.capstoneproject.util.Constants;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +28,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
     private MutableLiveData<List<Trivia>> mTriviaLiveData = new MutableLiveData<>();
     private MutableLiveData<Integer> mTriviaCounter = new MutableLiveData<>();
     private MutableLiveData<Long> mTimeLeftinMilisLiveData = new MutableLiveData<>();
-
     private List<Trivia> mTriviaList;
-    private List<File> imageFiles;
 
     private User mUser;
     private CountDownTimer countDownTimer;
@@ -80,7 +77,7 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
             Timber.d("Initializing the trivia list");
             for (DataSnapshot triviaSnapshot : dataSnapshot.getChildren()) {
                 Trivia trivia = triviaSnapshot.getValue(Trivia.class);
-                if (trivia.getDifficulty().equals(selectedDifficulty) && mTriviaList.size() < 10) {
+                if (trivia.getDifficulty().equals(selectedDifficulty) && mTriviaList.size() < Constants.QUIZ_MAX_SIZE) {
                     mTriviaList.add(trivia);
                     Timber.d("This is the question: %s", trivia.getQuestion());
                     Timber.d("This is the number of trivia: %s", mTriviaList.size());
@@ -131,12 +128,6 @@ public class QuizViewModel extends ViewModel implements FirebaseRepository.OnFir
         Trivia trivia = mTriviaList.get(mCurrentTriviaNumber-1);
         Timber.d("Getting the current trivia with question: %s", trivia.getQuestion());
         return trivia;
-    }
-
-    public String getCurrentTriviaImage() {
-        String imageFilePath = imageFiles.get(mCurrentTriviaNumber-1).getPath();
-        Timber.d("Returning image from QuizViewmodel with path%s", imageFilePath);
-        return imageFilePath;
     }
 
     public void updateQuizScoreLiveData() {

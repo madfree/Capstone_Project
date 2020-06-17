@@ -54,7 +54,8 @@
         android:src="@drawable/ic_timer_black"
         app:layout_constraintBottom_toBottomOf="@id/text_view_timer_countdown"
         app:layout_constraintEnd_toStartOf="@id/text_view_timer_countdown"
-        app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown" />
+        app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown"
+        android:contentDescription="@string/clock_icon" />
 
     <TextView
         android:id="@+id/text_view_question"
@@ -81,7 +82,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text_view_question"
         app:layout_constraintTop_toTopOf="@+id/text_view_question"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:contentDescription="@string/question_image"/>
 
     <LinearLayout
         android:id="@+id/answer_layout"
@@ -90,6 +92,7 @@
         android:gravity="bottom|center"
         android:orientation="horizontal"
         android:padding="8dp"
+        style="?android:attr/buttonBarStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,6 +104,7 @@
             android:layout_height="100dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:text="@string/sample_answer_1"
             android:textColor="@android:color/white" />
@@ -112,6 +116,7 @@
             android:layout_margin="4dp"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:text="@string/sample_answer_2"
             android:textColor="@android:color/white" />
@@ -122,6 +127,7 @@
             android:layout_height="100dp"
             android:layout_margin="4dp"
             android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:text="@string/sample_answer_3"
             android:textColor="@android:color/white" />
@@ -133,6 +139,7 @@
             android:layout_margin="4dp"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
+            style="?android:attr/buttonBarButtonStyle"
             android:background="@color/colorPrimary"
             android:text="@string/sample_answer_4"
             android:textColor="@android:color/white" />

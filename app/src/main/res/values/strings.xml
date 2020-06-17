@@ -30,6 +30,8 @@
     <string name="sample_answer_3">answer 3</string>
     <string name="sample_answer_4">answer 4</string>
     <string name="empty_quiz_string">Oh no! No trivias found for your selection. Please try again!</string>
+    <string name="question_image">question image</string>
+    <string name="clock_icon">clock icon</string>
 
 <!--    Result screen-->
     <string name="result_title">Quiz result</string>
@@ -51,8 +53,10 @@
     <string name="new_trivia_success_icon_desc">trivia upload was successful</string>
     <string name="new_trivia_success">Success!</string>
     <string name="new_trivia_button_add">New trivia</string>
+    <string name="photo_picker_button">photo picker</string>
 
 <!--    Navigation Drawer-->
+    <string name="user_image">user image</string>
     <string name="home_link">Home</string>
     <string name="ranking_link">Ranking</string>
     <string name="submit_trivia_link">Submit trivia</string>

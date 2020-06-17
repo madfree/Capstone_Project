@@ -233,7 +233,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void resetButtonColor() {
+    private void resetButtonColor() {
         question_answer_1.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         question_answer_2.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         question_answer_3.setBackgroundColor(getResources().getColor(R.color.colorPrimary));

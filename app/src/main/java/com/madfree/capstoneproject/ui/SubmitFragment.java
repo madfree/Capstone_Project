@@ -1,7 +1,6 @@
 package com.madfree.capstoneproject.ui;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -111,7 +110,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
         if (submitViewModel.getImageUploadInputData() != null) {
             mImageUploadInputData = submitViewModel.getImageUploadInputData();
-            mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_check_green));;
+            mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_check_green));
         }
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override

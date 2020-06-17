@@ -1,6 +1,5 @@
 package com.madfree.capstoneproject.widget;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -41,7 +40,7 @@ public class WidgetDataProvider implements RemoteViewsFactory {
         this.intent = intent;
     }
 
-    public void fetchData() {
+    private void fetchData() {
         countDown = new CountDownLatch(1);
         try {
             DatabaseReference userRef = db.getReference("users");

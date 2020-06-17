@@ -32,7 +32,6 @@ public class ScoreWidgetProvider extends AppWidgetProvider {
         setRemoteAdapter(context, views);
         views.setEmptyView(R.id.widget_list, R.id.empty_view);
 
-        /** PendingIntent to launch the MainActivity when the widget was clicked **/
         Intent launchMain = new Intent(context, MainActivity.class);
         PendingIntent pendingMainIntent = PendingIntent.getActivity(context, 0, launchMain, 0);
         views.setOnClickPendingIntent(R.id.widget, pendingMainIntent);

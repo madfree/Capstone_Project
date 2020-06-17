@@ -54,7 +54,8 @@
         android:src="@drawable/ic_timer_black"
         app:layout_constraintBottom_toBottomOf="@id/text_view_timer_countdown"
         app:layout_constraintEnd_toStartOf="@id/text_view_timer_countdown"
-        app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown" />
+        app:layout_constraintTop_toTopOf="@id/text_view_timer_countdown"
+        android:contentDescription="@string/clock_icon" />
 
     <ImageView
         android:id="@+id/image_view_question"
@@ -64,7 +65,8 @@
         android:layout_marginTop="24dp"
         android:scaleType="centerCrop"
         app:layout_constraintTop_toBottomOf="@+id/text_view_question_count"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:contentDescription="@string/question_image" />
 
     <TextView
         android:id="@+id/text_view_question"

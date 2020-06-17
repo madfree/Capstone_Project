@@ -16,8 +16,8 @@
             android:layout_height="22dp"
             android:layout_gravity="center"
             android:layout_margin="8dp"
-
-            android:src="@mipmap/logo_small_horizontal" />
+            android:src="@mipmap/logo_small_horizontal"
+            android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/widget_title_text_view"
