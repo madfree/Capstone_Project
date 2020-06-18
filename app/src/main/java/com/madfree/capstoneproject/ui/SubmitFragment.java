@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
+import androidx.work.WorkInfo;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
@@ -56,8 +58,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
 
     private Spinner mCategorySpinner;
     private Spinner mDifficultySpinner;
-
-    private Data mImageUploadInputData;
+    private ProgressBar progressBar;
 
     @Nullable
     @Override
@@ -85,6 +86,8 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mUploadSuccessTextView.setVisibility(View.GONE);
         mCheckSuccessImageView.setVisibility(View.GONE);
         mNewTriviaButton.setVisibility(View.GONE);
+        progressBar = view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
 
         ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.
                 createFromResource(view.getContext(), R.array.category_array, android.R.layout.simple_spinner_item);
@@ -108,10 +111,6 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mApplication = getActivity().getApplication();
         submitViewModel = new ViewModelProvider(requireActivity(), new SubmitViewModelFactory(mApplication)).get(SubmitViewModel.class);
 
-        if (submitViewModel.getImageUploadInputData() != null) {
-            mImageUploadInputData = submitViewModel.getImageUploadInputData();
-            mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_check_green));
-        }
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,6 +126,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 if (mSelectedCategory.equals(Constants.KEY_CATEGORY_RANDOM) || mSelectedDifficulty.equals(Constants.KEY_DIFFICULTY_RANDOM) ||
                         mQuestionEditText.getText().toString().equals("") || mAnswerEditText.getText().toString().equals("") ||
                         mWrong1EditText.getText().toString().equals("") || mWrong2EditText.getText().toString().equals("") ||
@@ -139,7 +139,17 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
                     String wrong_answer_1 = mWrong1EditText.getText().toString();
                     String wrong_answer_2 = mWrong2EditText.getText().toString();
                     String wrong_answer_3 = mWrong3EditText.getText().toString();
-                    submitViewModel.submitTriviaToDb(question, answer, wrong_answer_1, wrong_answer_2, wrong_answer_3, mSelectedCategory, mSelectedDifficulty);
+                    submitViewModel.submitTriviaToDb(question, answer, wrong_answer_1, wrong_answer_2, wrong_answer_3, mSelectedCategory, mSelectedDifficulty)
+                            .observe(getViewLifecycleOwner(), new Observer<WorkInfo>() {
+                                @Override
+                                public void onChanged(WorkInfo workInfo) {
+                                    // Check if the current work's state is "successfully finished"
+                                    if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                        progressBar.setVisibility(View.GONE);
+                                        showSuccessUI();
+                                    }
+                                }
+                            });
                 }
             }
         });
@@ -148,19 +158,6 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onClick(View view) {
                 showInitialUI();
-            }
-        });
-
-        submitViewModel.getIsUploadComplete().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean uploadComplete) {
-                if (uploadComplete) {
-                    Toast.makeText(getContext(),"Trivia successfully added to database!", Toast.LENGTH_LONG).show();
-                    showSuccessUI();
-                    submitViewModel.resetIsUploadComplete();
-                } else {
-                    Toast.makeText(getContext(), "Couldn't add trivia to database. Please try again later.", Toast.LENGTH_LONG).show();
-                }
             }
         });
 
@@ -196,6 +193,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mWrong3EditText.getText().clear();
         mCategorySpinner.setSelection(0);
         mDifficultySpinner.setSelection(0);
+        mPhotoPickerButton.setBackground(getResources().getDrawable(R.drawable.ic_add_image));
     }
 
     private void showSuccessUI() {
@@ -215,7 +213,7 @@ public class SubmitFragment extends Fragment implements AdapterView.OnItemSelect
         mImageHint.setVisibility(View.GONE);
         mSubmitButton.setVisibility(View.GONE);
         clearAll();
-        mImageUploadInputData = null;
+        submitViewModel.resetImageUploadInputData();
     }
 
     private void showInitialUI() {

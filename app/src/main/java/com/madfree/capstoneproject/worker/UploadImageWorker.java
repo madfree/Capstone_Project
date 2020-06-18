@@ -60,7 +60,6 @@ public class UploadImageWorker extends Worker {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "image successfully uploaded", Toast.LENGTH_SHORT).show();
                     Timber.d("Image was successfully uploaded to Firebase");
                     Uri downloadUri = task.getResult();
                     // set the mImageUrl Variable to the downloadUri from Firebase Storage

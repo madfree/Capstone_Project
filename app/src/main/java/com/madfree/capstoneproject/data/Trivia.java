@@ -65,4 +65,7 @@ public class Trivia {
         return difficulty;
     }
 
+    public String getCategory() {
+        return category;
+    }
 }

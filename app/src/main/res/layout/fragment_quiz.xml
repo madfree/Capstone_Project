@@ -78,7 +78,7 @@
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/answer_layout"
         app:layout_constraintTop_toBottomOf="@+id/text_view_question_count"
-        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintVertical_bias="0.8"
         app:layout_constraintVertical_chainStyle="packed" />
 
 
