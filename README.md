@@ -25,6 +25,3 @@ The app was reviewed by Udacity has been accepted as the final project of the Ud
 1. Download the zip-file with the code and import it into Android Studio OR clone the code with Android Studio.
 2. Create a Firebase Android project and add the app to this project
 3. Start the app via emulator or on your phone
-
-## License
-This app is Copyright © 2020 madfree. It is free software, and may be redistributed under the terms specified in the [LICENSE](/LICENSE) file.
